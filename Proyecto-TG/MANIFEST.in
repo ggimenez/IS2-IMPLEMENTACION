@@ -1,4 +1,0 @@
-recursive-include proyectotg/public *
-include proyectotg/public/favicon.ico
-recursive-include proyectotg/i18n *
-recursive-include proyectotg/templates *
