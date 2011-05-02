@@ -13,6 +13,24 @@ from proyectosaptg.controllers.error import ErrorController
 from proyectosaptg import model
 from proyectosaptg.controllers.secure import SecureController
 
+
+from tg import validate
+from tg import tmpl_context
+
+from proyectosaptg.model import *
+
+from sprox.formbase import AddRecordForm
+from tw.forms import TextField,CalendarDatePicker
+class AddUsuario(AddRecordForm):
+    __model__ = Usuario
+    __omit_fields__ = [
+        'id_usuario', 
+    ]
+    nombres = TextField
+    apellidos = TextField	
+    username = TextField
+add_usuario_form = AddUsuario(DBSession)
+
 __all__ = ['RootController']
 
 
@@ -37,9 +55,23 @@ class RootController(BaseController):
     error = ErrorController()
 
     @expose('proyectosaptg.templates.index')
-    def index(self):
+    def index(self, **named):
         """Handle the front-page."""
-        return dict(page='index')
+        usuarios = DBSession.query( Usuario ).order_by( Usuario.username )
+        tmpl_context.add_usuario_form = add_usuario_form
+        from webhelpers import paginate
+        count = usuarios.count()
+        page =int( named.get( 'page', '1' ))
+        currentPage = paginate.Page(
+            usuarios, page, item_count=count,
+            items_per_page=5,
+        )
+        usuarios = currentPage.items
+        return dict(
+            page='index',
+            usuarios = usuarios,
+            currentPage = currentPage,
+        )
 
     @expose('proyectosaptg.templates.about')
     def about(self):
@@ -106,3 +138,23 @@ class RootController(BaseController):
         """
         flash(_('We hope to see you soon!'))
         redirect(came_from)
+
+    @expose( )
+    @validate(
+        form=add_usuario_form,
+        error_handler=index,
+    )
+    def add_usuario( self, nombres, apellidos, username, password ,fecha_creacion, **named ):
+        """Create a new Usuario record"""
+        new = Usuario(
+	    nombres = nombres,
+	    apellidos = apellidos,		
+            username = username,
+            password = password,
+            fecha_creacion = fecha_creacion,
+        )
+        DBSession.add( new )
+        flash( '''Added usuario: %s'''%( username, ))
+        redirect( './index' )
+
+	   	

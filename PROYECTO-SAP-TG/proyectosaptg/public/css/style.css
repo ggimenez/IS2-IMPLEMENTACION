@@ -21,7 +21,7 @@ a {
 #header {
 	height: 132px;
 	margin: 10px 10px 0 10px;
-	background: url('../images/headerbg.png') top left no-repeat;
+	background: url('../images/theheader.jpg') top left no-repeat;
 }
 
 #header h1 {
@@ -32,6 +32,18 @@ a {
 	color: #fff;
 	position: relative;
 	font-size: 36px;
+}
+
+#usuario-index .usuario-listing {
+    width: 100%;
+    background-color: lightgray;
+}
+#usuario-index .usuario-listing tr {
+    background-color: white;
+}
+.navigation .pager {
+    text-align: center;
+    color: darkgrey;
 }
 
 #header h1 .subtitle {

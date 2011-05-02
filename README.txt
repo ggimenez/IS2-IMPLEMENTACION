@@ -3,4 +3,4 @@ Integrantes:
 	Pedro Amarilla
 	Marco Alvarez
 	Gabriel Giménez
-Descripción: Somos unos teko..
+Descripción:
