@@ -61,3 +61,4 @@ def init_model(engine):
 # Import your model modules here.
 from proyectosaptg.model.auth import User, Group, Permission
 from proyectosaptg.model.usuario import *
+from proyectosaptg.model.proyecto import *
