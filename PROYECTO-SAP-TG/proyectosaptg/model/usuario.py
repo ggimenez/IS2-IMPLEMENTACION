@@ -19,10 +19,3 @@ class Usuario(DeclarativeBase):
 	password = Column(Unicode, nullable=False)
 	fecha_creacion = Column(Date, nullable=False, default=datetime.datetime.now()  )
 	proyectos = relationship("Proyecto", backref="usuario")
-
-	"""
-	def __repr__(self):
-		return (u"<Usuario('%s','%s', '%s', '%s', '%s', '%s')>" % (
-			self.id_usuario, self.nombres, self.apellidos, self.username, self.password, self.fecha_creacion
-		)).encode('utf-8')"""
-
