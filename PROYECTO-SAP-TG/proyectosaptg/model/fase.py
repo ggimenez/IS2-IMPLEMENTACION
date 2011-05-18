@@ -10,11 +10,11 @@ __all__ = [ 'Fase' ]
 
 class Fase(DeclarativeBase):
 
-	__tablename__ = 'fase'
+    __tablename__ = 'fase'
 
-	id_fase = Column(Integer, primary_key=True)
-	cod_fase = Column(Unicode, nullable=False,unique=True)
-	nombre = Column(Unicode, nullable=False)
-	estado = Column(Unicode, nullable=False, default = 'CREADO')
-	lineas_bases = relationship("LineaBase", backref="fase")
-	items = relationship("Item", backref="fase")
+    id_fase = Column(Integer, primary_key=True)
+    cod_fase = Column(Unicode, nullable=False,unique=True)
+    nombre = Column(Unicode, nullable=False)
+    estado = Column(Unicode, nullable=False, default = 'CREADO')
+    lineas_bases = relationship("LineaBase", backref="fase")
+    items = relationship("Item", backref="fase")

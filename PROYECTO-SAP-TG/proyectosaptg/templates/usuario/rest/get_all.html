@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="master.html" />
+<head/>
+<body>
+  <div style="height:0px;"> &nbsp; </div>
+  <div>
+    <div style="float:left width: 80%">
+      <h1 style="margin-top:1px;">Lista de Usuarios</h1>
+      <a href='new/'>Nuevo Usuario</a>
+        <table>
+          <tr>
+          <th>Nombres</th>
+          <th>Apellidos</th>
+          <th>Username</th>
+          <th>Password</th>
+          <th>Fecha de Creación</th>
+          </tr>
+          <tr py:for="i, usuario in enumerate(usuarios)" class="${i%2 and 'even' or 'odd'}">
+            <td>${usuario.nombres}</td>
+            <td>${usuario.apellidos}</td>
+	    <td>${usuario.username}</td>
+            <td>${usuario.password}</td>
+            <td>${usuario.fecha_creacion}</td>
+          </tr>
+        </table>
+    </div>
+  </div>
+</body>
+</html>

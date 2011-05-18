@@ -15,4 +15,4 @@ class TipoItem(DeclarativeBase):
 	id_tipo_item = Column(Integer, primary_key=True)
 	cod_tipo_item = Column(Unicode, nullable=False,unique=True)
 	descripcion = Column(Unicode, nullable=True)
-	atributoss = relationship("Atributo", backref="tipo_item")
+	atributos = relationship("Atributo", backref="tipo_item")

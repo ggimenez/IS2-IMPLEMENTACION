@@ -1,28 +1,6 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
-from tg import expose, flash, require, url, request, redirect
-from pylons.i18n import ugettext as _, lazy_ugettext as l_
-from tgext.admin.tgadminconfig import TGAdminConfig
-from tgext.admin.controller import AdminController
-from repoze.what import predicates
-
-from proyectosaptg.lib.base import BaseController
-from proyectosaptg.model import DBSession, metadata
-from proyectosaptg.controllers.error import ErrorController
-from proyectosaptg import model
-from proyectosaptg.controllers.secure import SecureController
-
-from tg import tmpl_context
-from proyectosaptg.widgets.add_usuario_form import create_add_user_form
-
-
-
-from tg import validate
-
-
-from proyectosaptg.model import *
-
 from sprox.formbase import AddRecordForm
 from tw.forms import TextField,CalendarDatePicker
 
@@ -36,17 +14,32 @@ from proyectosaptg.model import DBSession, Usuario
 
 from tw.core import WidgetsList
 from tw.forms import TableForm, TextField, CalendarDatePicker, SingleSelectField, TextArea, PasswordField
-from formencode.validators import Int, NotEmpty, DateConverter, DateValidator, Identity
-
-
+from formencode.validators import Int, NotEmpty, DateConverter, DateValidator
 from sprox.formbase import EditableForm
 from sprox.fillerbase import EditFormFiller
 
+from tw.forms.validators import Schema, Int, NotEmpty, UnicodeString, \
+                                FieldsMatch, Email, URL      
+from formencode.schema import SimpleFormValidator
 
 
-#prueba con crudcontroller
+#prueba con crudrestcontroller
+from tw.api import CSSLink
+from tw.forms.validators import Schema, Int, NotEmpty, UnicodeString, \
+                                FieldsMatch, Email, URL
+from tg import config, url                                
+
+
+from proyectosaptg.widgets.validators import  UniqueUserName
 
 class UsuarioForm(TableForm):
+    #css = [CSSLink(link=url('/theme/%s/_css/user.css' % config['theme']))]
+    """validator = Schema(
+        chained_validators=[
+            UniqueUserName(),
+            ]
+        )"""
+  
     # This WidgetsList is just a container
     class fields(WidgetsList):
         nombres = TextField(validator=NotEmpty)
@@ -54,7 +47,7 @@ class UsuarioForm(TableForm):
 	username = TextField(validator=NotEmpty)
 	password = PasswordField(validator=NotEmpty)
         #fecha_creacion = CalendarDatePicker(validator=DateConverter())
-        
+        submit_tex = "Crear Usuario"
 #then, we create an instance of this form
 usuario_add_form = UsuarioForm("create_usuario_form")
 
@@ -78,14 +71,28 @@ class UsuarioTableFiller(TableFiller):
     __model__ = Usuario
 usuario_table_filler = UsuarioTableFiller(DBSession)
 
-class UsuarioController(CrudRestController):
+
+from datetime import datetime
+from tg.controllers import RestController, redirect
+from tg.decorators import expose, validate
+from proyectosaptg.model import DBSession, Usuario
+from formencode.validators import DateConverter, Int, NotEmpty
+
+from formencode.schema import SimpleFormValidator
+
+
+class UsuarioRootController(CrudRestController):
    
     model = Usuario
     table = usuario_table
     table_filler = usuario_table_filler
     new_form = usuario_add_form	
     edit_filler = usuario_edit_filler		
-    edit_form = usuario_edit_form	
+    edit_form = usuario_edit_form
 
-
-
+    
+     
+    
+ 
+  
+    

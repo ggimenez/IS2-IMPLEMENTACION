@@ -1,0 +1,14 @@
+from tw.api import WidgetsList
+from tw.forms import TableForm, CalendarDatePicker, SingleSelectField, TextField, TextArea
+from tw.forms import PasswordField
+
+class UsuarioForm(TableForm):
+
+    class fields(WidgetsList):
+        nombres = TextField()
+        apellidos = TextField()
+        username = TextField()
+        password = PasswordField()
+
+
+create_usuario_form = UsuarioForm("create_usuario_form",action='create')

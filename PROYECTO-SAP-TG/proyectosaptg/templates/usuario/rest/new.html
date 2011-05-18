@@ -1,0 +1,23 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<xi:include href="master.html" />
+<head/>
+<body>
+  <div style="height:0px;"> &nbsp; </div>
+  <h2> Nuevo Usuario</h2>
+  <form method="POST" action="./">
+    <table>
+    <tr><td>Nombres </td><td><input type="textfield" name="nombres" value="${values.get('nombres', '')}"/>${tmpl_context.form_errors.get('nombres')}</td></tr>
+     <tr><td>Apellidos </td><td><input type="textfield" name="apellidos" value="${values.get('apellidos', '')}"/>${tmpl_context.form_errors.get('apellidos')}</td></tr>
+    <tr><td>Username </td><td><input type="textfield" name="username" value="${values.get('username', '')}"/>${tmpl_context.form_errors.get('username')}</td></tr>
+    <tr><td>Password </td><td><input type="passwordfield" name="password" value="${values.get('password', '')}"/>${tmpl_context.form_errors.get('password')}</td></tr>  
+
+    
+    </table><br/>
+    <input type="submit" value="Crear Usuario"/>
+  </form>
+  
+</body>
+</html>
