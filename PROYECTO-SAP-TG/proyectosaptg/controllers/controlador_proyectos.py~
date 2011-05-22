@@ -109,9 +109,9 @@ proyecto_edit_filler = ProyectoEditFiller(DBSession)
 
 
 class ProyectoController(CrudRestController):
-    model = Proyecto
-    table = proyecto_table
-    table_filler = proyecto_table_filler
-    new_form = proyecto_add_form
-    edit_form = proyecto_edit_form
-    edit_filler = proyecto_edit_filler	
+	model = Proyecto
+	table = proyecto_table
+	table_filler = proyecto_table_filler
+	new_form = proyecto_add_form
+	edit_form = proyecto_edit_form
+	edit_filler = proyecto_edit_filler	

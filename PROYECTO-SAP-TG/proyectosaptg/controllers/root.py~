@@ -31,7 +31,7 @@ from sprox.fillerbase import TableFiller
 
 
 from tgext.crud import CrudRestController
-from proyectosaptg.model import DBSession, Usuario
+#from proyectosaptg.model import DBSession, Usuario
 
 
 from tw.core import WidgetsList
@@ -43,15 +43,15 @@ from sprox.formbase import EditableForm
 from sprox.fillerbase import EditFormFiller
 
 
-from proyectosaptg.controllers.controlador_usuarios import * 
+#from proyectosaptg.controllers.controlador_usuarios import * 
 #from proyectosaptg.controllers.controlador_proyectos import *
-
+from proyectosaptg.controllers.admin import *
 
 
 #abm de forma manual
-from tg import tmpl_context
+#from tg import tmpl_context
 #from proyectosaptg.widgets.usuario_form import create_usuario_form
-#from proyectosaptg.controllers.user_controller import *
+#from proyectosaptg.controllers.controlador_proyectos import *
 
 
 class RootController(BaseController):
@@ -76,7 +76,8 @@ class RootController(BaseController):
     secc = SecureController()    
 
     admin = AdminController(model, DBSession, config_type=TGAdminConfig)
-
+    admin = AdminController(model, DBSession, config_type=MyAdminConfig)
+    #admin = AdminController([Proyecto], DBSession, config_type=MyAdminConfig)
     error = ErrorController()
 
     
@@ -141,12 +142,12 @@ class RootController(BaseController):
         flash(_('Welcome back, %s!') % userid)
         redirect(came_from)
 
-      @expose()
-      def post_logout(self, came_from=url('/')):
-          """
-          Redirect the user to the initially requested page on logout and say
-          goodbye as well.
+    @expose()
+    def post_logout(self, came_from=url('/')):
+        """
+        Redirect the user to the initially requested page on logout and say
+        goodbye as well.
 
-          """
-          flash(_('We hope to see you soon!'))
-          redirect(came_from)
+        """
+        flash(_('We hope to see you soon!'))
+        redirect(came_from)

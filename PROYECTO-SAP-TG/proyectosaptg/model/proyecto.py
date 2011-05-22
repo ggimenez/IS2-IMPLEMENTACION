@@ -20,4 +20,4 @@ class Proyecto(DeclarativeBase):
     fecha_creacion = Column(Date, nullable=True, default=datetime.datetime.now())
     fecha_inicio = Column(Date, nullable=True)
     fecha_finalizacion_anulacion = Column(Date, nullable=True)
-    user_id = Column(Integer, ForeignKey('usuario.id_usuario'))
+    user_id = Column(Integer, ForeignKey('tg_user.user_id'))
