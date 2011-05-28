@@ -42,7 +42,7 @@ base_config.DBSession = proyectosaptg.model.DBSession
 # Configure the authentication backend
 
 # YOU MUST CHANGE THIS VALUE IN PRODUCTION TO SECURE YOUR APP 
-base_config.sa_auth.cookie_secret = "ChangeME" 
+base_config.sa_auth.cookie_secret = "pIgSm2" 
 
 base_config.auth_backend = 'sqlalchemy'
 base_config.sa_auth.dbsession = model.DBSession
