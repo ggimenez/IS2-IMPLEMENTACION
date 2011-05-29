@@ -16,6 +16,7 @@ from pylons.i18n import ugettext as _, lazy_ugettext as l_
 from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
 from repoze.what import predicates
+from repoze.what.predicates import not_anonymous
 
 from proyectosaptg.lib.base import BaseController
 from proyectosaptg.model import DBSession, metadata
@@ -162,16 +163,19 @@ class RootController(BaseController):
 
     
     @expose('proyectosaptg.templates.index')
+    #@require(not_anonymous(msg='Por favor inicia sesion para continuar.'))
     def index(self):
         return dict(page='index')	
 
 
     @expose('proyectosaptg.templates.about')
+    @require(not_anonymous(msg='Por favor inicia sesion para continuar.'))
     def about(self):
         """Handle the 'about' page."""
         return dict(page='about')
 
     @expose('proyectosaptg.templates.environ')
+    @require(not_anonymous(msg='Por favor inicia sesion para continuar.'))
     def environ(self):
         """This method showcases TG's access to the wsgi environment."""
         return dict(environment=request.environ)
@@ -183,6 +187,7 @@ class RootController(BaseController):
         return dict(params=kw)
 
     @expose('proyectosaptg.templates.authentication')
+    @require(not_anonymous(msg='Por favor inicia sesion para continuar.'))
     def auth(self):
         """Display some information about auth* on this application."""
         return dict(page='auth')
