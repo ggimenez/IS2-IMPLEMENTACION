@@ -15,6 +15,7 @@ class Fase(DeclarativeBase):
     id_fase = Column(Integer, primary_key=True)
     cod_fase = Column(Unicode, nullable=False,unique=True)
     nombre = Column(Unicode, nullable=False)
+    descripcion = Column(Unicode, nullable=True)                
     estado = Column(Unicode, nullable=False, default = 'CREADO')
     lineas_bases = relationship("LineaBase", backref="fase")
     items = relationship("Item", backref="fase")

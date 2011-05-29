@@ -41,13 +41,7 @@ class UserCrudConfig(CrudRestControllerConfig):
     class table_filler_type(TableFiller):
         __entity__ = User
         __limit_fields__ = ['user_id', 'user_name','nombres_apellidos', 'email_address','created','groups']
-    
-    #class NewForm():
-     #   pass
-       # ___fields__ = ['_password', 'groups', 'created', 'user_id', 'town_id','proyectos']
-        
-    
-    
+   
     new_form_type = UserRegistrationForm
 
 
@@ -93,24 +87,41 @@ class ProyectoCrudConfig(CrudRestControllerConfig):
                                                          'Passwords do not match'}),))"""
 class TipoItemRegistrationForm(AddRecordForm):
     __model__ = TipoItem
-    __require_fields__ = ['cod_tipo_item', 'descripcion']
+    __require_fields__ = ['cod_tipo_item','nombre' ,'descripcion']
     __omit_fields__ = ['id_tipo_item']
     #__field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
     #__base_validator__     = user_form_validator
+    nombre           = TextField
     cod_tipo_item           = TextField
     #descripcion                 = TextArea
-    
+    __dropdown_field_names__ = {'atributos':'nombre'}
     
 
 class TipoItemCrudConfig(CrudRestControllerConfig):
     class table_type(TableBase):
         __entity__ =  TipoItem
-        __limit_fields__ = ['cod_tipo_item', 'descripcion','atributos']
+        __limit_fields__ = ['cod_tipo_item', 'nombre','descripcion','atributos']
         __url__ = '../tipoitem.json' #this just tidies up the URL a bit
+       
+
 
     class table_filler_type(TableFiller):
         __entity__ = TipoItem
-        __limit_fields__ = ['id_tipo_item','cod_tipo_item', 'descripcion','atributos']
+        __limit_fields__ = ['id_tipo_item','cod_tipo_item', 'nombre','descripcion','atributos']
+        
+        def atributos(self, obj, **kw):
+            
+            
+            nombres_atributos = ""
+            
+            for a in obj.atributos:
+        
+                #print a.nombre
+                nombres_atributos = nombres_atributos + ", " + a.nombre
+            #print nombres_atributos
+            return nombres_atributos[1:]
+            
+       
     new_form_type = TipoItemRegistrationForm
 
 
@@ -175,10 +186,66 @@ class FaseCrudConfig(CrudRestControllerConfig):
 
 
 
+"""configuraciones del modelo Item"""
+class ItemRegistrationForm(AddRecordForm):
+    __model__ = Item
+    __require_fields__ = ['cod_item', 'nombre']
+    __omit_fields__ = ['id_item','version','total_peso', 'estado', 'relaciones','id_fase_fk','id_linea_base_fk', 'relacion',
+                        'fase','linea_base']
+    #__field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
+    #__base_validator__     = user_form_validator
+    cod_item           = TextField
+    nombre = TextField
+    __dropdown_field_names__ = {'tipo_item':'nombre'}
+    
+    
+    
+class ItemCrudConfig(CrudRestControllerConfig):
+    class table_type(TableBase):
+        __entity__ =  Item
+        #__limit_fields__ = ['cod_fase', 'nombre','estado', 'items','lineas_bases']
+        __url__ = '../item.json' #this just tidies up the URL a bit
+
+    class table_filler_type(TableFiller):
+        __entity__ = Item
+        #__limit_fields__ = ['id_fase','cod_fase', 'nombre','estado', 'items','lineas_bases']
+    new_form_type = ItemRegistrationForm
+
+
+
+"""configuraciones del modelo Fase"""
+class FaseRegistrationForm(AddRecordForm):
+    __model__ = Fase
+    __require_fields__ = ['cod_fase', 'nombre']
+    __omit_fields__ = ['id_fase','estado','lineas_bases', 'items']
+    #__field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
+    #__base_validator__     = user_form_validator
+    cod_fase           = TextField
+    nombre = TextField
+    
+   
+    
+class FaseCrudConfig(CrudRestControllerConfig):
+    class table_type(TableBase):
+        __entity__ =  Fase
+        #__limit_fields__ = ['cod_fase', 'nombre','estado', 'items','lineas_bases']
+        __url__ = '../fase.json' #this just tidies up the URL a bit
+
+    class table_filler_type(TableFiller):
+        __entity__ = Fase
+        #__limit_fields__ = ['id_fase','cod_fase', 'nombre','estado', 'items','lineas_bases']
+    new_form_type = FaseRegistrationForm
+
+        
+    
+
 #instancimos todas nuestras configuraciones
 class MyAdminConfig(AdminConfig):
+      
     user = UserCrudConfig
     proyecto = ProyectoCrudConfig
     tipoitem = TipoItemCrudConfig
     atributo = AtributoCrudConfig
+    fase = FaseCrudConfig
+    item = ItemCrudConfig
     fase = FaseCrudConfig

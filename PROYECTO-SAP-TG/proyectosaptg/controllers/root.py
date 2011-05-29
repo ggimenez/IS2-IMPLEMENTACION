@@ -2,6 +2,16 @@
 """Main Controller"""
 
 from tg import expose, flash, require, url, request, redirect
+
+
+
+
+from tg.decorators import with_trailing_slash
+from tg import config as tg_config
+
+
+
+
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
 from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
@@ -51,7 +61,66 @@ from proyectosaptg.controllers.admin import *
 #abm de forma manual
 #from tg import tmpl_context
 #from proyectosaptg.widgets.usuario_form import create_usuario_form
-#from proyectosaptg.controllers.controlador_proyectos import *
+from proyectosaptg.controllers.controlador_proyectos import *
+
+import inspect
+from sqlalchemy.orm import class_mapper
+
+from proyectosaptg import model
+from proyectosaptg.model import DBSession
+
+
+class MyAdminSysController(AdminController):
+    menu = {}
+    def __init__(self, models, session, config_type=None, translations=None, menu=None):
+        super(AdminController, self).__init__()
+        if translations is None:
+            translations = {}
+        if config_type is None:
+            config = AdminConfig(models, translations)
+        else:
+            config = config_type(models, translations)
+
+        if config.allow_only:
+            self.allow_only = config.allow_only
+
+        self.config = config
+        self.session = session
+
+        self.menu = menu
+
+
+        self.default_index_template = ':'.join((tg_config.default_renderer, self.index.decoration.engines.get('text/html')[1]))
+        if self.config.default_index_template:
+            self.default_index_template = self.config.default_index_template
+
+    @with_trailing_slash
+    @expose('tgext.admin.templates.index')
+    def index(self):
+        #overrides the template for this method
+        original_index_template = self.index.decoration.engines['text/html']
+        new_engine = self.default_index_template.split(':')
+        new_engine.extend(original_index_template[2:])
+        self.index.decoration.engines['text/html'] = new_engine
+        return dict(models=self.menu)
+
+    def _make_controller(self, config, session):
+        m = config.model
+        Controller = config.defaultCrudRestController
+        class ModelController(Controller):
+            model        = m
+            table        = config.table_type(session)
+            table_filler = config.table_filler_type(session)
+            new_form     = config.new_form_type(session)
+            new_filler   = config.new_filler_type(session)
+            edit_form    = config.edit_form_type(session)
+            edit_filler  = config.edit_filler_type(session)
+            allow_only   = config.allow_only
+        menu_items = None
+        if self.config.include_left_menu:
+            menu_items = self.menu
+        return ModelController(session, menu_items)
+
 
 
 class RootController(BaseController):
@@ -70,14 +139,25 @@ class RootController(BaseController):
     """
     #prueba con crudcontroller	
     #usuarios = UsuarioRootController(DBSession)
-    #proyectos = ProyectoController(DBSession)
-
+    #proyectos = ProyectoController(DBSession, menu_items=models)
+    
 
     secc = SecureController()    
 
-    admin = AdminController(model, DBSession, config_type=TGAdminConfig)
-    admin = AdminController(model, DBSession, config_type=MyAdminConfig)
-    #admin = AdminController([Proyecto], DBSession, config_type=MyAdminConfig)
+    #admin = AdminController(model, DBSession, config_type=TGAdminConfig)
+    
+    
+
+    menu_adm_sys = {}
+    menu_adm_sys[User.__name__.lower()] = User
+    menu_adm_sys[Permission.__name__.lower()] = Permission
+    menu_adm_sys[Group.__name__.lower()] = Group
+    menu_adm_sys[Proyecto.__name__.lower()] = Proyecto
+    menu_adm_sys[TipoItem.__name__.lower()] = TipoItem
+    menu_adm_sys[Atributo.__name__.lower()] = Atributo          
+    #admin = AdminController(model, DBSession, config_type=MyAdminConfig, xfavor=models)
+    admin = MyAdminSysController(model, DBSession, config_type=MyAdminConfig, menu=menu_adm_sys)
+    #admin = AdminController([Proyecto, User], DBSession, config_type=MyAdminConfig)
     error = ErrorController()
 
     
