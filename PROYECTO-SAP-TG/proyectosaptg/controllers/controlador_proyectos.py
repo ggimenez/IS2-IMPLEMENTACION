@@ -82,6 +82,11 @@ from sprox.formbase import EditableForm
 from sprox.fillerbase import EditFormFiller
 
 
+from tg import expose, flash, require, url, request, redirect
+from tg.decorators import without_trailing_slash, with_trailing_slash
+from tg.decorators import paginate
+
+
 
 class ProyectoTable(TableBase):
     __model__ = Proyecto
@@ -114,4 +119,15 @@ class ProyectoController(CrudRestController):
     table_filler = proyecto_table_filler
     new_form = proyecto_add_form
     edit_form = proyecto_edit_form
-    edit_filler = proyecto_edit_filler	
+    edit_filler = proyecto_edit_filler
+    
+  
+    #@expose('proyectosaptg.templates.get_all')
+    @with_trailing_slash
+    @expose('proyectosaptg.templates.get_all')
+    @expose('json')
+    @paginate('value_list', items_per_page=7)
+    def get_all(self, *args, **kw):
+        print "get all redefinido..:me llamaron..\n"
+        return super(ProyectoController, self).get_all(*args,**kw)
+        

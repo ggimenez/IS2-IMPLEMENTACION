@@ -19,3 +19,6 @@ class Fase(DeclarativeBase):
     estado = Column(Unicode, nullable=False, default = 'CREADO')
     lineas_bases = relationship("LineaBase", backref="fase")
     items = relationship("Item", backref="fase")
+
+
+    proyecto_id = Column(Integer, ForeignKey('proyecto.id_proyecto'), nullable=False)

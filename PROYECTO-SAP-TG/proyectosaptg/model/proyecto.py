@@ -21,3 +21,5 @@ class Proyecto(DeclarativeBase):
     fecha_inicio = Column(Date, nullable=True)
     fecha_finalizacion_anulacion = Column(Date, nullable=True)
     user_id = Column(Integer, ForeignKey('tg_user.user_id'))
+    
+    fases = relationship("Fase", backref="Proyecto")

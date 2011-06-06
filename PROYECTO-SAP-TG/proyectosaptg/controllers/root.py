@@ -140,7 +140,7 @@ class RootController(BaseController):
     """
     #prueba con crudcontroller	
     #usuarios = UsuarioRootController(DBSession)
-    #proyectos = ProyectoController(DBSession, menu_items=models)
+    #proyectos = ProyectoController(DBSession)
     
 
     secc = SecureController()    
@@ -224,6 +224,11 @@ class RootController(BaseController):
                         login_counter = request.environ['repoze.who.logins'] + 1
                         redirect('/login', came_from=came_from, __logins=login_counter)
         userid = request.identity['repoze.who.userid']
+        #print "esto es userid:\n"
+        #print userid
+        #id_el = request.identity['repoze.who.user_id']
+        #print id_el
+        
         flash(_('Welcome back, %s!') % userid)
         redirect(came_from)
 
