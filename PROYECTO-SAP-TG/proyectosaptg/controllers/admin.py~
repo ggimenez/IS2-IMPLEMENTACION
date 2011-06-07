@@ -2,7 +2,7 @@ from tgext.admin.config import AdminConfig, CrudRestControllerConfig
 from sprox.formbase import AddRecordForm
 from formencode import Schema
 from formencode.validators import FieldsMatch
-from tw.forms import PasswordField, TextField
+from tw.forms import *
 
 
 from sprox.tablebase import TableBase
@@ -213,10 +213,11 @@ class FaseRegistrationForm(AddRecordForm):
     __omit_fields__ = ['id_fase','estado','lineas_bases']
     #__field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
     #__base_validator__     = user_form_validator
+    #__hidden_fields__      = ['proyecto_id']
     cod_fase           = TextField
     nombre = TextField
     #descripcion                 = TextArea
-    
+    proyecto_id = HiddenField
     
 
 
@@ -253,6 +254,40 @@ class FaseCrudConfig(CrudRestControllerConfig):
             count = len(objs)
             self.__count__ = count
             return count, objs
+        
+        
+    class defaultCrudRestController(CrudRestController):
+        
+        
+        @with_trailing_slash
+        @expose('proyectosaptg.templates.get_all')
+        @expose('json')
+        @paginate('value_list', items_per_page=7)
+        def get_all(self, *args, **kw):
+            
+              
+            pid =  kw['pid']
+            
+            retorno = CrudRestController.get_all(self, *args, **kw)
+            
+            retorno['pid'] = pid
+            
+            return  retorno
+      
+        @without_trailing_slash
+        @expose('tgext.crud.templates.new')
+        def new(self, *args, **kw):
+            """Display a page to show a new record."""
+            
+          
+            print kw
+            
+            kw['proyecto_id'] = 2
+            print kw
+            tmpl_context.widget = self.new_form
+            return dict(value=kw, model=self.model.__name__)
+        
+        
         
     new_form_type = FaseRegistrationForm
 
