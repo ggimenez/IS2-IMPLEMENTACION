@@ -50,6 +50,45 @@ user_group_table = Table('tg_user_group', metadata,
 )
 
 
+#tabla intermedia entre proyecto y usuario
+project_user_table = Table('tg_project_user', metadata,
+    Column('user_id', Integer, ForeignKey('tg_user.user_id',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+    Column('proyec_id', Integer, ForeignKey('proyecto.id_proyecto',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+)
+
+
+#tabla intermedia entre proyectos y roles
+proyecto_group_table = Table('tg_proyecto_group', metadata,
+    Column('proyec_id', Integer, ForeignKey('proyecto.id_proyecto',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+    Column('group_id', Integer, ForeignKey('tg_group.group_id',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+)
+
+#tabla intermedia entre permisos y fases
+permisos_fase_table = Table('tg_permisos_fase', metadata,
+    Column('permisos_id', Integer, ForeignKey('tg_permission.permission_id',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+    Column('fase_id', Integer, ForeignKey('fase.id_fase',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+)
+
+
+#tabla intermedia entre proyectos, usuarios y roles
+project_user_group_table = Table('tg_project_user_group', metadata,
+    Column('user_id', Integer, ForeignKey('tg_user.user_id',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+    Column('proyec_id', Integer, ForeignKey('proyecto.id_proyecto',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+    Column('group_id', Integer, ForeignKey('tg_group.group_id',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+)
+
+
+
+
 #{ The auth* model itself
 
 
@@ -122,8 +161,8 @@ class User(DeclarativeBase):
 
 
     #relaciones
-    proyectos = relationship("Proyecto", backref="tg_user")
-
+    #proyectos = relationship("Proyecto", backref="tg_user")
+    proyectos = relationship('Proyecto', secondary=project_user_table, backref='user')
 
     #{ Special methods
 
