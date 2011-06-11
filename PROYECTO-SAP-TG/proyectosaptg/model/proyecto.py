@@ -8,6 +8,16 @@ from proyectosaptg.model.auth import proyecto_group_table
 
 import datetime 
 
+#tabla intermedia entre proyectos y tipos de items
+proyecto_tipo_item_table = Table('proyecto_tipo_item', metadata,
+    Column('proyecto_id', Integer, ForeignKey('proyecto.id_proyecto',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+    Column('tipo_item_id', Integer, ForeignKey('tipo_item.id_tipo_item',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+)
+
+
+
 __all__ = [ 'Proyecto' ]
 
 class Proyecto(DeclarativeBase):
@@ -23,8 +33,17 @@ class Proyecto(DeclarativeBase):
     fecha_inicio = Column(Date, nullable=True)
     fecha_finalizacion_anulacion = Column(Date, nullable=True)
     
+<<<<<<< HEAD
    
     fases = relationship("Fase")
     
     
     roles = relationship('Group', secondary=proyecto_group_table, backref='proyecto')
+=======
+    #user_id = Column(Integer, ForeignKey('tg_user.user_id'))
+    
+    fases = relationship("Fase")
+    
+    
+    tipo_items = relationship('TipoItem', secondary=proyecto_tipo_item_table)
+>>>>>>> ee222bde8a35a0efb9d1059b72d5c19c2484ded5

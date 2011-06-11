@@ -36,6 +36,6 @@ class Item(DeclarativeBase):
 
     id_linea_base_fk = Column(Integer, ForeignKey('linea_base.id_linea_base'))
 
-    id_fase_fk = Column(Integer, ForeignKey('fase.id_fase'))
+    id_fase_fk = Column(Integer, ForeignKey('fase.id_fase'),nullable=False)
 
     relaciones = relation('Relacion', secondary=relacion_item_table, backref='item')

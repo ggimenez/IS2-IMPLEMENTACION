@@ -67,6 +67,7 @@ from proyectosaptg.model.atributo import *
 from proyectosaptg.model.tipo_item import *
 from proyectosaptg.model.item import *
 from proyectosaptg.model.linea_base import *
-#from proyectosaptg.model.fase import *
+from proyectosaptg.model.fase import *
 from proyectosaptg.model.relacion import *
 from proyectosaptg.model.relacion_item_table import *
+from proyectosaptg.model.valores import *
