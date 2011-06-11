@@ -70,3 +70,4 @@ from proyectosaptg.model.linea_base import *
 from proyectosaptg.model.fase import *
 from proyectosaptg.model.relacion import *
 from proyectosaptg.model.relacion_item_table import *
+from proyectosaptg.model.valores import *

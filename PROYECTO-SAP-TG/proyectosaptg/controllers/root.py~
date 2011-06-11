@@ -155,9 +155,11 @@ class RootController(BaseController):
     menu_adm_sys[Group.__name__.lower()] = Group
     menu_adm_sys[Proyecto.__name__.lower()] = Proyecto
     menu_adm_sys[TipoItem.__name__.lower()] = TipoItem
-    menu_adm_sys[Atributo.__name__.lower()] = Atributo          
+    menu_adm_sys[Atributo.__name__.lower()] = Atributo
+    #menu_adm_sys[Valores.__name__.lower()] = Valores
     #admin = AdminController(model, DBSession, config_type=MyAdminConfig, xfavor=models)
-    admin = MyAdminSysController(model, DBSession, config_type=MyAdminConfig, menu=menu_adm_sys)
+    admin= MyAdminSysController(model, DBSession, config_type=MyAdminConfig, menu=menu_adm_sys)
+    
     #admin = AdminController([Proyecto, User], DBSession, config_type=MyAdminConfig)
     error = ErrorController()
 
