@@ -14,9 +14,10 @@ class LineaBase(DeclarativeBase):
 
 	id_linea_base = Column(Integer, primary_key=True)
 	cod_linea_base = Column(Unicode, nullable=False,unique=True)
-	version = Column(Integer, nullable=False)
+	version = Column(Integer, nullable=False, default = 0)
+	descripcion = Column(Unicode, nullable=True)
 	estado = Column(Unicode, nullable=False, default = 'CERRADO')
-	peso_acumulado = Column(Integer, nullable=True)
+	peso_acumulado = Column(Integer, nullable=True, default = 0)
 	fecha_creacion = Column(Date, nullable=False, default=datetime.datetime.now())
 
 	id_fase_fk = Column(Integer, ForeignKey('fase.id_fase'))

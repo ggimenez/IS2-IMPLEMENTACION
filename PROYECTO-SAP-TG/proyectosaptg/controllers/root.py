@@ -57,6 +57,7 @@ from sprox.fillerbase import EditFormFiller
 #from proyectosaptg.controllers.controlador_usuarios import * 
 #from proyectosaptg.controllers.controlador_proyectos import *
 from proyectosaptg.controllers.admin import *
+from proyectosaptg.controllers.admin2 import *
 
 
 #abm de forma manual

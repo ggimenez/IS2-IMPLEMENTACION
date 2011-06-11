@@ -4,6 +4,8 @@ from sqlalchemy.types import *
 
 from proyectosaptg.model import DeclarativeBase, metadata, DBSession
 
+from proyectosaptg.model.auth import proyecto_group_table
+
 import datetime 
 
 __all__ = [ 'Proyecto' ]
@@ -20,6 +22,9 @@ class Proyecto(DeclarativeBase):
     fecha_creacion = Column(Date, nullable=True, default=datetime.datetime.now())
     fecha_inicio = Column(Date, nullable=True)
     fecha_finalizacion_anulacion = Column(Date, nullable=True)
-    user_id = Column(Integer, ForeignKey('tg_user.user_id'))
     
+   
     fases = relationship("Fase")
+    
+    
+    roles = relationship('Group', secondary=proyecto_group_table, backref='proyecto')

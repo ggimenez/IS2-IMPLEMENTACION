@@ -21,4 +21,4 @@ class Fase(DeclarativeBase):
     items = relationship("Item", backref="fase")
 
 
-    proyecto_id = Column(Integer, ForeignKey('proyecto.id_proyecto', nullable=False))
+    proyecto_id = Column(Integer, ForeignKey('proyecto.id_proyecto'), nullable=False)

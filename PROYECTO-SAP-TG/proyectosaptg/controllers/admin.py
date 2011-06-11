@@ -64,7 +64,7 @@ class ProyectoRegistrationForm(AddRecordForm):
     __model__ = Proyecto
     __require_fields__ = ['cod_proyecto', 'nombre']
     __omit_fields__ = ['id_proyecto', 'estado','fecha_creacion' ,'fecha_inicio', 
-                      'fecha_finalizacion_anulacion', 'fases']
+                      'fecha_finalizacion_anulacion', 'fases', 'user']
     #__field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
     #__base_validator__     = user_form_validator
     cod_proyecto           = TextField
@@ -76,7 +76,7 @@ class ProyectoCrudConfig(CrudRestControllerConfig):
     class table_type(TableBase):
         __entity__ = Proyecto
         __limit_fields__ = ['cod_proyecto', 'nombre','estado', 'fecha_creacion','fecha_inicio', 
-                            'fecha_finalizacion_anulacion', 'user_id']
+                            'fecha_finalizacion_anulacion']
         #__omit_fields__ = ['__actions__'] 
           
         
@@ -86,11 +86,11 @@ class ProyectoCrudConfig(CrudRestControllerConfig):
     class table_filler_type(TableFiller):
         __entity__ = Proyecto
         __limit_fields__ = ['id_proyecto','cod_proyecto', 'nombre','estado', 'fecha_creacion', 
-                            'fecha_inicio', 'fecha_finalizacion_anulacion', 'user_id']
+                            'fecha_inicio', 'fecha_finalizacion_anulacion']
                             
-        def user_id(self, obj, **kw):
+        """def user_id(self, obj, **kw):
             user = DBSession.query(User).filter_by(user_id=obj.user_id).one()
-            return user.user_name
+            return user.user_name"""
         
         
         def __actions__(self, obj):
@@ -210,14 +210,14 @@ class FaseRegistrationForm(AddRecordForm):
   
     __model__ = Fase
     __require_fields__ = ['cod_fase', 'nombre']
-    __omit_fields__ = ['id_fase','estado','lineas_bases']
+    __omit_fields__ = ['id_fase','estado','lineas_bases','items']
     #__field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
     #__base_validator__     = user_form_validator
     #__hidden_fields__      = ['proyecto_id']
     cod_fase           = TextField
     nombre = TextField
     #descripcion                 = TextArea
-    proyecto_id = HiddenField
+    #proyecto_id = HiddenField
     
 
 
