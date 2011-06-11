@@ -33,17 +33,12 @@ class Proyecto(DeclarativeBase):
     fecha_inicio = Column(Date, nullable=True)
     fecha_finalizacion_anulacion = Column(Date, nullable=True)
     
-<<<<<<< HEAD
+
    
-    fases = relationship("Fase")
-    
-    
-    roles = relationship('Group', secondary=proyecto_group_table, backref='proyecto')
-=======
-    #user_id = Column(Integer, ForeignKey('tg_user.user_id'))
+	
     
     fases = relationship("Fase")
     
     
     tipo_items = relationship('TipoItem', secondary=proyecto_tipo_item_table)
->>>>>>> ee222bde8a35a0efb9d1059b72d5c19c2484ded5
+

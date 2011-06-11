@@ -38,4 +38,4 @@ class Item(DeclarativeBase):
 
     id_fase_fk = Column(Integer, ForeignKey('fase.id_fase'),nullable=False)
 
-    relaciones = relation('Relacion', secondary=relacion_item_table, backref='item')
+    relaciones = relation('Relacion', secondary=relacion_item_table)

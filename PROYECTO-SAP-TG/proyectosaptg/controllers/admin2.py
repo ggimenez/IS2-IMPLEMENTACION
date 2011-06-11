@@ -39,7 +39,7 @@ class RelacionCrudConfig(CrudRestControllerConfig):
             '</div><div>'\
             '<form method="POST" action="'+pklist+'" class="button-to">'\
             '<input type="hidden" name="_method" value="DELETE" />'\
-            '<input class="delete-button" onclick="return confirm(\'Está seguro que desea eliminar?\');" value="delete" type="submit" '\
+            '<input class="delete-button" onclick="return confirm(\'Esta seguro que desea eliminar?\');" value="delete" type="submit" '\
             'style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0;"/>'\
             '</form>'\
             '<a class="fases_link" href="../relaciones/?pid='+pklist+'">Relacion</a>'\
@@ -86,7 +86,7 @@ class LineaBaseCrudConfig(CrudRestControllerConfig):
             '</div><div>'\
             '<form method="POST" action="'+pklist+'" class="button-to">'\
             '<input type="hidden" name="_method" value="DELETE" />'\
-            '<input class="delete-button" onclick="return confirm(\'Está seguro que desea eliminar?\');" value="delete" type="submit" '\
+            '<input class="delete-button" onclick="return confirm(\'Esta seguro que desea eliminar?\');" value="delete" type="submit" '\
             'style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0;"/>'\
             '</form>'\
             '<a class="fases_link" href="../linea_base/?pid='+pklist+'">Linea Base</a>'\
@@ -107,4 +107,4 @@ class LineaBaseCrudConfig(CrudRestControllerConfig):
 #instancimos todas nuestras configuraciones
 class MyAdmin2Config(AdminConfig):
     relacion = RelacionCrudConfig
-    linea_base = LineaBaseCrudConfig
+    lineabase = LineaBaseCrudConfig

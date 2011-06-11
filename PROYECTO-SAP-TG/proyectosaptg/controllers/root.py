@@ -158,7 +158,14 @@ class RootController(BaseController):
     menu_adm_sys[TipoItem.__name__.lower()] = TipoItem
     menu_adm_sys[Atributo.__name__.lower()] = Atributo
     #admin = AdminController(model, DBSession, config_type=MyAdminConfig, xfavor=models)
+    menu_gconfig = {}
+    
+    menu_gconfig[Relacion.__name__.lower()] = Relacion
+    menu_gconfig[LineaBase.__name__.lower()] = LineaBase
+    
     admin= MyAdminSysController(model, DBSession, config_type=MyAdminConfig, menu=menu_adm_sys)
+    
+    gconfig= MyAdminSysController(model, DBSession, config_type=MyAdmin2Config, menu=menu_gconfig)
     
     #admin = AdminController([Proyecto, User], DBSession, config_type=MyAdminConfig)
     error = ErrorController()
