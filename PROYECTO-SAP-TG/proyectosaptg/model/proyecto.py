@@ -33,7 +33,7 @@ class Proyecto(DeclarativeBase):
     fecha_inicio = Column(Date, nullable=True)
     fecha_finalizacion_anulacion = Column(Date, nullable=True)
     
-
+    usuario_creador = Column(Unicode, nullable=False)
    
 	
     

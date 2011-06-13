@@ -1,5 +1,5 @@
 from tgext.admin.config import AdminConfig, CrudRestControllerConfig
-from sprox.formbase import AddRecordForm
+from sprox.formbase import AddRecordForm, EditableForm
 from formencode import Schema
 from formencode.validators import FieldsMatch
 from tw.forms import *
@@ -7,6 +7,8 @@ from tw.forms import *
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
+from sprox.fillerbase import EditFormFiller
+
 
 
 from proyectosaptg.model import *
@@ -21,6 +23,9 @@ from tgext.crud.decorators import registered_validate, register_validators, catc
 from tg import tmpl_context
 
 from tgext.crud.controller import CrudRestController
+
+
+from sprox.widgets import PropertyMultipleSelectField
 
 
 """configuraciones del modelo User"""
@@ -57,6 +62,8 @@ class UserCrudConfig(CrudRestControllerConfig):
 
 
 
+from repoze.what import predicates
+from repoze.what.predicates import not_anonymous
 
 """configuraciones del modelo Proyecto"""
 """proyecto_form_validator =  Schema(chained_validators=(FieldsMatch('password',
@@ -68,18 +75,17 @@ class ProyectoRegistrationForm(AddRecordForm):
     __require_fields__ = ['cod_proyecto', 'nombre']
     __omit_fields__ = ['id_proyecto', 'estado','fecha_creacion' ,'fecha_inicio', 
                       'fecha_finalizacion_anulacion', 'fases','user']
-    #__field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
-    #__base_validator__     = user_form_validator
     cod_proyecto           = TextField
     nombre                 = TextField
-    
-    
+    usuario_creador = HiddenField
+    __dropdown_field_names__ = {'tipo_items':'nombre'}
+     
 
 class ProyectoCrudConfig(CrudRestControllerConfig):
     class table_type(TableBase):
         __entity__ = Proyecto
         __limit_fields__ = ['cod_proyecto', 'nombre','estado', 'fecha_creacion','fecha_inicio', 
-                            'fecha_finalizacion_anulacion']
+                            'fecha_finalizacion_anulacion','usuario_creador']
         #__omit_fields__ = ['__actions__'] 
           
         
@@ -89,7 +95,7 @@ class ProyectoCrudConfig(CrudRestControllerConfig):
     class table_filler_type(TableFiller):
         __entity__ = Proyecto
         __limit_fields__ = ['id_proyecto','cod_proyecto', 'nombre','estado', 'fecha_creacion', 
-                            'fecha_inicio', 'fecha_finalizacion_anulacion']
+                            'fecha_inicio', 'fecha_finalizacion_anulacion','usuario_creador']
                             
         """def user_id(self, obj, **kw):
             user = DBSession.query(User).filter_by(user_id=obj.user_id).one()
@@ -125,12 +131,35 @@ class ProyectoCrudConfig(CrudRestControllerConfig):
             return CrudRestController.get_all(self, *args, **kw)
       
     
-        
+        @without_trailing_slash
+        @expose('proyectosaptg.templates.new')
+        def new(self, *args, **kw):
+            """Display a page to show a new record."""
+            
+            #obtenemos el nombre del usuario creador del proyecto
+            user = request.identity['repoze.who.userid'] 
+           
+            print "new de proyecto, esto es user:\n"
+            print user
+            
+            kw["usuario_creador"]= user
+            
+            tmpl_context.widget = self.new_form
+            
+            retorno = dict(value=kw, model=self.model.__name__)
+            
+            return retorno
     
     #proyecto_table_filler = CamposTableFiller(DBSession)                        
     new_form_type = ProyectoRegistrationForm
 
       
+    
+    
+    
+  
+      
+    
     
 
 
@@ -139,6 +168,24 @@ class ProyectoCrudConfig(CrudRestControllerConfig):
                                                          'verify_password',
                                                          messages={'invalidNoMatch':
                                                          'Passwords do not match'}),))"""
+
+
+"""from sprox.widgets import PropertyMultipleSelectField
+class MyPropertyMultipleSelectField(PropertyMultipleSelectField):
+    def _my_update_params(self, d, nullable=False):
+        
+        print "MyPropertyMultipleSelectField,d:\n:"
+        print d
+        
+        atributos = DBSession.query(Atributo).filter_by(id_atributo=d["filtrar_id"]).all()
+        options = [(atributo.id_atributo, atributo.nombre)
+                            for atributo in atributos]
+        d['options']= options
+        return d"""
+    
+
+
+
 class TipoItemRegistrationForm(AddRecordForm):
     __model__ = TipoItem
     __require_fields__ = ['cod_tipo_item','nombre' ,'descripcion']
@@ -150,11 +197,16 @@ class TipoItemRegistrationForm(AddRecordForm):
     #descripcion                 = TextArea
     __dropdown_field_names__ = {'atributos':'nombre'}
     
+    #atributos_options = [1,2]
+   #atributos =  MyPropertyMultipleSelectField
+    
 
 class TipoItemCrudConfig(CrudRestControllerConfig):
     class table_type(TableBase):
         __entity__ =  TipoItem
         __limit_fields__ = ['cod_tipo_item', 'nombre','descripcion','atributos']
+        
+        
         __url__ = '../tipoitem.json' #this just tidies up the URL a bit
        
 
@@ -170,8 +222,7 @@ class TipoItemCrudConfig(CrudRestControllerConfig):
                         nombres_atributos = nombres_atributos + ", " + a.nombre
             
             return nombres_atributos[1:]
-            
-       
+    
     new_form_type = TipoItemRegistrationForm
 
 
@@ -181,15 +232,19 @@ class TipoItemCrudConfig(CrudRestControllerConfig):
                                                          'verify_password',
                                                          messages={'invalidNoMatch':
                                                          'Passwords do not match'}),))"""
+
+
+from sprox.widgets import PropertySingleSelectField
 class AtributoRegistrationForm(AddRecordForm):
     __model__ = Atributo
     __require_fields__ = ['cod_atributo', 'nombre','tipo_dato']
-    __omit_fields__ = ['id_atributo',]
-    #__field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
-    #__base_validator__     = user_form_validator
+    __omit_fields__ = ['id_atributo']
     cod_atributo           = TextField
     nombre = TextField
-    tipo_dato = TextField
+    tipodatochoices = (("Cadena"),("Numerico"))
+    
+    
+    tipo_dato = SingleSelectField
     #descripcion                 = TextArea
     
     
@@ -205,7 +260,30 @@ class AtributoCrudConfig(CrudRestControllerConfig):
         __entity__ = Atributo
         __limit_fields__ = ['id_atributo','cod_atributo', 'nombre','descripcion', 'tipo_dato']
         
+    
+    
+    class defaultCrudRestController(CrudRestController):
         
+        
+            
+        @without_trailing_slash
+        @expose('proyectosaptg.templates.new_atributo')
+        def new(self, *args, **kw):
+            """Display a page to show a new record."""
+            
+            
+            tipos = ["Cadena","Numerico","Fecha"]
+            
+            tmpl_context.widget = self.new_form
+            
+            retorno = dict(value=kw, model=self.model.__name__, tipo_dato_options = tipos)
+            
+            return retorno
+    
+    
+    
+    
+    
     new_form_type = AtributoRegistrationForm
 
 
@@ -436,6 +514,7 @@ class ItemRegistrationForm(AddRecordForm):
     nombre = TextField
     __dropdown_field_names__ = {'tipo_item':'nombre'}
     
+    tipo_item = SingleSelectField
     
     
 class ItemCrudConfig(CrudRestControllerConfig):
@@ -499,6 +578,7 @@ class ItemCrudConfig(CrudRestControllerConfig):
             
             val = kw["fid"]
             
+            
             #print kw
             #print args
             
@@ -511,10 +591,28 @@ class ItemCrudConfig(CrudRestControllerConfig):
             return retorno
             
         @without_trailing_slash
-        @expose('proyectosaptg.templates.new_fase')
+        @expose('proyectosaptg.templates.new_item')
         def new(self, *args, **kw):
             """Display a page to show a new record."""
             print "new itme\n"
+            
+            """filtramos solo los Tipos de Items asociados al Proyecto"""
+            id_fase = args[0]
+            #traemos la fase de la BD
+            fase = DBSession.query(Fase).filter_by(id_fase = id_fase).one()
+            #obtenemos el id del Proyecto, traemos el Proyecto y sus Tipos de Items
+            id_proyecto = fase.proyecto_id
+            proyecto = DBSession.query(Proyecto).filter_by(id_proyecto = id_proyecto).one()
+            tipo_items = proyecto.tipo_items
+            #obtenemos lo id y los nombres de los tipos de items del Proyecto para enviarlos como las opciones 
+            #disponibles
+            id_tipo_items = []
+            for tipo_item in tipo_items:
+                id_tipo_items.append((tipo_item.id_tipo_item,tipo_item.nombre))
+                
+            print id_tipo_items    
+            
+            
             
             
             if len(args) > 0:
@@ -528,6 +626,8 @@ class ItemCrudConfig(CrudRestControllerConfig):
             tmpl_context.widget = self.new_form
             
             retorno = dict(value=kw, model=self.model.__name__)
+            
+            retorno["id_tipo_items"] = id_tipo_items
             
             return retorno
             
@@ -661,7 +761,38 @@ class ValoresCrudConfig(CrudRestControllerConfig):
         def fk_item(self, obj, **kw):
             item = DBSession.query(Item).filter_by(id_item=obj.fk_item).one()
             return item.nombre
-       
+    
+    class edit_form_type(EditableForm):
+        __entity__ = Valores
+        __require_fields__     = ['valor']
+        __omit_fields__        = ['id_valor']
+               
+        
+        def _do_get_disabled_fields(self):
+            fields = self.__disable_fields__[:]
+            fields.append(self.__provider__.get_primary_field(self.__entity__))
+            print fields
+            fields.append("fk_atributo")
+            fields.append("fk_item")
+            return fields
+        
+        
+    class edit_filler_type(EditFormFiller):
+        __entity__ = Valores
+        
+        def fk_atributo(self, obj,**kw):    
+            atributo_nombre = DBSession.query(Atributo.nombre).filter_by(id_atributo = obj.fk_atributo).one()
+            print atributo_nombre
+            return str(atributo_nombre[0])
+        
+        def fk_item(self, obj,**kw):  
+            item_nombre = DBSession.query(Item.nombre).filter_by(id_item = obj.fk_item).one()
+           
+            return str(item_nombre[0])
+        
+    
+    
+    
     new_form_type = ValoresRegistrationForm
 
 
@@ -763,7 +894,7 @@ class LineaBaseCrudConfig(CrudRestControllerConfig):
                 print args
     
             
-            #kw ['cod_linea_base'] = ['holaaaaaaaaaaaa']
+            
             
             
             tmpl_context.widget = self.new_form
@@ -860,19 +991,19 @@ class LineaBaseCrudConfig(CrudRestControllerConfig):
 class RelacionRegistrationForm(AddRecordForm):
     __model__ = Relacion
     __require_fields__ = ['cod_relacion', 'descripcion']
-    __omit_fields__ = ['id_relacion', 'estado','items']
+    __omit_fields__ = ['id_relacion', 'estado']
     cod_relacion           = TextField
     descripcion            = TextArea
     
 class RelacionCrudConfig(CrudRestControllerConfig):
     class table_type(TableBase):
         __entity__ = Relacion
-        __limit_fields__ = ['cod_relacion', 'descripcion','estado', 'items']
+        __limit_fields__ = ['cod_relacion', 'descripcion','estado',]
         __url__ = '../relacion.json' #this just tidies up the URL a bit
 
     class table_filler_type(TableFiller):
         __entity__ = Relacion
-        __limit_fields__ = ['id_relacion','cod_relacion', 'descripcion','estado', 'items']
+        __limit_fields__ = ['id_relacion','cod_relacion', 'descripcion','estado']
         
         def __actions__(self, obj):
             """Override this function to define how action links should be displayed for the given record."""
