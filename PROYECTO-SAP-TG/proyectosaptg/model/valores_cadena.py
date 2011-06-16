@@ -4,7 +4,7 @@ from sqlalchemy.types import *
 
 from proyectosaptg.model import DeclarativeBase, metadata, DBSession
 
-__all__ = [ 'Valores' ]
+__all__ = [ 'ValoresCadena' ]
 
 class ValoresCadena(DeclarativeBase):
 
@@ -14,6 +14,6 @@ class ValoresCadena(DeclarativeBase):
     fk_atributo = Column(Integer, ForeignKey('atributo.id_atributo'))
     fk_item = Column(Integer, ForeignKey('item.id_item'))
     
-    valor = Column(Unicode, nullable=False)
+    valor = Column(Unicode, nullable=False, default= 'sin valor')
     
     descripcion = Column(Unicode, nullable=False)    

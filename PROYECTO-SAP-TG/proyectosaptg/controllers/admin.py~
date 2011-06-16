@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from tgext.admin.config import AdminConfig, CrudRestControllerConfig
 from sprox.formbase import AddRecordForm, EditableForm
 from formencode import Schema
@@ -322,6 +324,9 @@ class FaseCrudConfig(CrudRestControllerConfig):
             primary_fields = self.__provider__.get_primary_fields(self.__entity__)
             pklist = '/'.join(map(lambda x: str(getattr(obj, x)), primary_fields))
             
+            print "obj:"
+            print obj
+            
                        
             value =  '<div><div><a class="edit_link" href="'+pklist+'/edit" style="text-decoration:none">edit</a>'\
             '</div><div>'\
@@ -517,16 +522,52 @@ class ItemRegistrationForm(AddRecordForm):
     tipo_item = SingleSelectField
     
     
+    
+    
+    
+    
 class ItemCrudConfig(CrudRestControllerConfig):
     class table_type(TableBase):
         __entity__ =  Item
         __limit_fields__ = ['cod_item', 'nombre','estado', 'version','peso','id_tipo_item_fk','id_linea_base_fk','relaciones']
         __url__ = '../item.json' #this just tidies up the URL a bit
+        __xml_fields__ = ['Atributos']
+        __headers__ = {'id_tipo_item_fk':'Atributos'}
+
 
     class table_filler_type(TableFiller):
         __entity__ = Item
         __limit_fields__ = ['cod_item', 'nombre','estado', 'version','peso','id_tipo_item_fk','id_linea_base_fk','relaciones']
-    
+
+               
+        
+        def id_tipo_item_fk(self, obj):
+            
+            tipo_item = DBSession.query(TipoItem).filter_by(id_tipo_item=obj.id_tipo_item_fk).one()
+            atributos = tipo_item.atributos
+             
+            
+            id_item = obj.id_item
+            
+            
+            retorno = ''
+            for a in atributos:
+                nombre_atributo = a.nombre
+                
+                if a.tipo_dato == "Cadena":
+                    controlador = "valorescadenas"
+                elif a.tipo_dato == "Fecha":
+                    controlador = "valoresfechas"
+                elif a.tipo_dato == "Numerico":
+                    controlador = "valoresnumeros"
+                
+                retorno = retorno + ('<a href="../'+controlador+'/?iid='+str(id_item)+'">'+nombre_atributo+'</a>') + ','
+           
+            print retorno
+            
+            return retorno.join(('<div>', '</div>'))
+
+
      
         def __actions__(self, obj):
             """Override this function to define how action links should be displayed for the given record."""
@@ -541,7 +582,6 @@ class ItemCrudConfig(CrudRestControllerConfig):
             '<input class="delete-button" onclick="return confirm(\'Are you sure?\');" value="delete" type="submit" '\
             'style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0;"/>'\
             '</form>'\
-            '<a class="valores_link" href="../valoress/?iid='+pklist+'">Atributos</a> '\
             '<a class="relacion_link" href="../relacions/?iid='+pklist+'">Relaciones</a>'\
             '</div></div>'
             
@@ -574,19 +614,12 @@ class ItemCrudConfig(CrudRestControllerConfig):
         @paginate('value_list', items_per_page=7)
         def get_all(self, *args, **kw):
             
-            #print "fase get_all"
             
             val = kw["fid"]
-            
-            
-            #print kw
-            #print args
-            
+                        
             retorno =  CrudRestController.get_all(self, *args, **kw)
            
             retorno["fid"] = val 
-            
-            #print retorno
             
             return retorno
             
@@ -654,14 +687,26 @@ class ItemCrudConfig(CrudRestControllerConfig):
             atributos_new_item = new_item.tipo_item.atributos
             fk_item = new_item.id_item 
             for atributo in atributos_new_item:
+                
+                tipo_dato_atr = atributo.tipo_dato
+                
+                
                 fk_atributo = atributo.id_atributo
                 el_valor = {}
                 el_valor['fk_atributo'] = fk_atributo
                 el_valor['fk_item'] = fk_item
-                el_valor['valor'] = "vacio"
+                #el_valor['valor'] = "vacio"
+                el_valor['descripcion'] = "Item:" + kw['nombre'] + "\nAtributo:" + atributo.nombre + "\nTipo:" + atributo.tipo_dato
                 
-                print el_valor
-                self.provider.create(Valores, params=el_valor)
+                if tipo_dato_atr == "Cadena":
+                    self.provider.create(ValoresCadena, params=el_valor)
+                elif tipo_dato_atr == "Fecha":
+                    self.provider.create(ValoresFecha, params=el_valor)
+                elif tipo_dato_atr == "Numerico":
+                    self.provider.create(ValoresNumero, params=el_valor)
+                
+                
+                
              
             path = '../?fid='+ str(fid)
             
@@ -729,29 +774,20 @@ class ItemCrudConfig(CrudRestControllerConfig):
 
 
 
-"""configuraciones del modelo Valores"""
-class ValoresRegistrationForm(AddRecordForm):
-    __model__ = Valores
+"""configuraciones del modelo ValoresCadena"""
+class ValoresCadenaRegistrationForm(AddRecordForm):
+    __model__ = ValoresCadena
     __require_fields__ = ['fk_atributo', 'fk_item','valor']
     __omit_fields__ = ['id_valor']
-   
-    #__field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
-    #__base_validator__     = user_form_validator
-    #cod_item           = TextField
-    #nombre = TextField
-    #__dropdown_field_names__ = {'tipo_item':'nombre'}
-
-
-class ValoresCrudConfig(CrudRestControllerConfig):
+  
+class ValoresCadenaCrudConfig(CrudRestControllerConfig):
     class table_type(TableBase):
-        __entity__ =  Valores
+        __entity__ =  ValoresCadena
         __limit_fields__ = ['fk_atributo', 'fk_item','valor']
-        __url__ = '../valores.json' #this just tidies up the URL a bit
+        __url__ = '../valorescadenas.json' #this just tidies up the URL a bit
        
-
-
     class table_filler_type(TableFiller):
-        __entity__ = Valores
+        __entity__ = ValoresCadena
         __limit_fields__ = ['fk_atributo', 'fk_item','valor']
             
         def fk_atributo(self, obj, **kw):
@@ -762,38 +798,254 @@ class ValoresCrudConfig(CrudRestControllerConfig):
             item = DBSession.query(Item).filter_by(id_item=obj.fk_item).one()
             return item.nombre
     
+        def _do_get_provider_count_and_objs(self, **kw):
+            
+            limit = kw.get('limit', None)
+            offset = kw.get('offset', None)
+            order_by = kw.get('order_by', None)
+            desc = kw.get('desc', False)
+            if len(kw) > 0:
+                objs = DBSession.query(self.__entity__).filter_by(fk_item=kw['iid']).all()
+            else:
+                objs = DBSession.query(self.__entity__).all()
+                
+            count = len(objs)
+            self.__count__ = count
+            return count, objs
+       
+    #vistas para edit...
     class edit_form_type(EditableForm):
-        __entity__ = Valores
-        __require_fields__     = ['valor']
-        __omit_fields__        = ['id_valor']
-               
+        __entity__ = ValoresCadena
+       
+        __omit_fields__        = ['id_valor',"fk_atributo"]       
         
-        def _do_get_disabled_fields(self):
-            fields = self.__disable_fields__[:]
-            fields.append(self.__provider__.get_primary_field(self.__entity__))
-            print fields
-            fields.append("fk_atributo")
-            fields.append("fk_item")
-            return fields
+        fk_item = HiddenField
         
+        descripcion = TextArea    
+        __field_order__ = ['descripcion','valor']
+        __disable_fields__ = ['descripcion']    
         
     class edit_filler_type(EditFormFiller):
-        __entity__ = Valores
-        
-        def fk_atributo(self, obj,**kw):    
-            atributo_nombre = DBSession.query(Atributo.nombre).filter_by(id_atributo = obj.fk_atributo).one()
-            print atributo_nombre
-            return str(atributo_nombre[0])
-        
-        def fk_item(self, obj,**kw):  
-            item_nombre = DBSession.query(Item.nombre).filter_by(id_item = obj.fk_item).one()
-           
-            return str(item_nombre[0])
-        
+        __entity__ = ValoresCadena
+     
+    class defaultCrudRestController(CrudRestController):
+        @expose('tgext.crud.templates.edit')
+        def edit(self, *args, **kw):
+            """Display a page to edit the record."""
+            tmpl_context.widget = self.edit_form
+            pks = self.provider.get_primary_fields(self.model)
+            kw = {}
+            for i, pk in  enumerate(pks):
+                kw[pk] = args[i]
+            value = self.edit_filler.get_value(kw)
+            value['_method'] = 'PUT'
+            
+            return dict(value=value, model=self.model.__name__, pk_count=len(pks)) 
+     
     
     
+        @expose()
+        @registered_validate(error_handler=edit)
+        def put(self, *args, **kw):
+            """update"""
+            pks = self.provider.get_primary_fields(self.model)
+            for i, pk in enumerate(pks):
+                if pk not in kw and i < len(args):
+                    kw[pk] = args[i]
+            
+            
+            print "put de valores cadenas.."
+            print kw
+            
+            iid = kw['fk_item']
+            path = '../' * len(pks) + "?iid=" + str(iid)
+            
+            self.provider.update(self.model, params=kw)
+            redirect(path)
     
-    new_form_type = ValoresRegistrationForm
+    
+    new_form_type = ValoresCadenaRegistrationForm
+
+
+"""configuraciones del modelo ValoresNumero"""
+class ValoresNumeroRegistrationForm(AddRecordForm):
+    __model__ = ValoresNumero
+    __require_fields__ = ['fk_atributo', 'fk_item','valor']
+    __omit_fields__ = ['id_valor']
+  
+class ValoresNumeroCrudConfig(CrudRestControllerConfig):
+    class table_type(TableBase):
+        __entity__ =  ValoresNumero
+        __limit_fields__ = ['fk_atributo', 'fk_item','valor']
+        __url__ = '../valoresnumeros.json' #this just tidies up the URL a bit
+       
+    class table_filler_type(TableFiller):
+        __entity__ = ValoresNumero
+        __limit_fields__ = ['fk_atributo', 'fk_item','valor']
+            
+        def fk_atributo(self, obj, **kw):
+            atributo = DBSession.query(Atributo).filter_by(id_atributo=obj.fk_atributo).one()
+            return atributo.nombre
+
+        def fk_item(self, obj, **kw):
+            item = DBSession.query(Item).filter_by(id_item=obj.fk_item).one()
+            return item.nombre
+    
+        def _do_get_provider_count_and_objs(self, **kw):
+            
+            limit = kw.get('limit', None)
+            offset = kw.get('offset', None)
+            order_by = kw.get('order_by', None)
+            desc = kw.get('desc', False)
+            if len(kw) > 0:
+                objs = DBSession.query(self.__entity__).filter_by(fk_item=kw['iid']).all()
+            else:
+                objs = DBSession.query(self.__entity__).all()
+                
+            count = len(objs)
+            self.__count__ = count
+            return count, objs
+       
+    #vistas para edit...
+    class edit_form_type(EditableForm):
+        __entity__ = ValoresNumero
+       
+        __omit_fields__        = ['id_valor',"fk_atributo"]       
+        
+        fk_item = HiddenField
+        
+        descripcion = TextArea    
+        __field_order__ = ['descripcion','valor']
+        __disable_fields__ = ['descripcion']    
+        
+    class edit_filler_type(EditFormFiller):
+        __entity__ = ValoresNumero
+     
+    class defaultCrudRestController(CrudRestController):
+        @expose('tgext.crud.templates.edit')
+        def edit(self, *args, **kw):
+            """Display a page to edit the record."""
+            tmpl_context.widget = self.edit_form
+            pks = self.provider.get_primary_fields(self.model)
+            kw = {}
+            for i, pk in  enumerate(pks):
+                kw[pk] = args[i]
+            value = self.edit_filler.get_value(kw)
+            value['_method'] = 'PUT'
+            
+            return dict(value=value, model=self.model.__name__, pk_count=len(pks)) 
+     
+    
+    
+        @expose()
+        @registered_validate(error_handler=edit)
+        def put(self, *args, **kw):
+            """update"""
+            pks = self.provider.get_primary_fields(self.model)
+            for i, pk in enumerate(pks):
+                if pk not in kw and i < len(args):
+                    kw[pk] = args[i]
+            
+            
+            iid = kw['fk_item']
+            path = '../' * len(pks) + "?iid=" + str(iid)
+            
+            self.provider.update(self.model, params=kw)
+            redirect(path)
+    
+    
+    new_form_type = ValoresNumeroRegistrationForm
+
+
+"""configuraciones del modelo ValoresFecha"""
+class ValoresFechaRegistrationForm(AddRecordForm):
+    __model__ = ValoresFecha
+    __require_fields__ = ['fk_atributo', 'fk_item','valor']
+    __omit_fields__ = ['id_valor']
+  
+class ValoresFechaCrudConfig(CrudRestControllerConfig):
+    class table_type(TableBase):
+        __entity__ =  ValoresFecha
+        __limit_fields__ = ['fk_atributo', 'fk_item','valor']
+        __url__ = '../valoresnumeros.json' #this just tidies up the URL a bit
+       
+    class table_filler_type(TableFiller):
+        __entity__ = ValoresFecha
+        __limit_fields__ = ['fk_atributo', 'fk_item','valor']
+            
+        def fk_atributo(self, obj, **kw):
+            atributo = DBSession.query(Atributo).filter_by(id_atributo=obj.fk_atributo).one()
+            return atributo.nombre
+
+        def fk_item(self, obj, **kw):
+            item = DBSession.query(Item).filter_by(id_item=obj.fk_item).one()
+            return item.nombre
+    
+        def _do_get_provider_count_and_objs(self, **kw):
+            
+            limit = kw.get('limit', None)
+            offset = kw.get('offset', None)
+            order_by = kw.get('order_by', None)
+            desc = kw.get('desc', False)
+            if len(kw) > 0:
+                objs = DBSession.query(self.__entity__).filter_by(fk_item=kw['iid']).all()
+            else:
+                objs = DBSession.query(self.__entity__).all()
+                
+            count = len(objs)
+            self.__count__ = count
+            return count, objs
+       
+    #vistas para edit...
+    class edit_form_type(EditableForm):
+        __entity__ = ValoresFecha
+       
+        __omit_fields__        = ['id_valor',"fk_atributo"]       
+        
+        fk_item = HiddenField
+        
+        descripcion = TextArea    
+        __field_order__ = ['descripcion','valor']
+        __disable_fields__ = ['descripcion']    
+        
+    class edit_filler_type(EditFormFiller):
+        __entity__ = ValoresFecha
+     
+    class defaultCrudRestController(CrudRestController):
+        @expose('tgext.crud.templates.edit')
+        def edit(self, *args, **kw):
+            """Display a page to edit the record."""
+            tmpl_context.widget = self.edit_form
+            pks = self.provider.get_primary_fields(self.model)
+            kw = {}
+            for i, pk in  enumerate(pks):
+                kw[pk] = args[i]
+            value = self.edit_filler.get_value(kw)
+            value['_method'] = 'PUT'
+            
+            return dict(value=value, model=self.model.__name__, pk_count=len(pks)) 
+     
+    
+    
+        @expose()
+        @registered_validate(error_handler=edit)
+        def put(self, *args, **kw):
+            """update"""
+            pks = self.provider.get_primary_fields(self.model)
+            for i, pk in enumerate(pks):
+                if pk not in kw and i < len(args):
+                    kw[pk] = args[i]
+            
+            
+            iid = kw['fk_item']
+            path = '../' * len(pks) + "?iid=" + str(iid)
+            
+            self.provider.update(self.model, params=kw)
+            redirect(path)
+    
+    
+    new_form_type = ValoresFechaRegistrationForm
+
 
 
 
@@ -916,10 +1168,7 @@ class LineaBaseCrudConfig(CrudRestControllerConfig):
             
             
             fid = kw['id_fase_fk']
-            #print kw["proyecto_id"]
             
-            
-            #kw['tipo_item']
             
             new_item = self.provider.create(self.model, params=kw)
             
@@ -1023,7 +1272,7 @@ class RelacionCrudConfig(CrudRestControllerConfig):
             return value
             
             
-	def _do_get_provider_count_and_objs(self, **kw):
+        def _do_get_provider_count_and_objs(self, **kw):
             
             limit = kw.get('limit', None)
             offset = kw.get('offset', None)
@@ -1051,7 +1300,6 @@ class RelacionCrudConfig(CrudRestControllerConfig):
 
 
     
-    
 
 #instancimos todas nuestras configuraciones
 class MyAdminConfig(AdminConfig):
@@ -1064,9 +1312,11 @@ class MyAdminConfig(AdminConfig):
     atributo = AtributoCrudConfig
     fase = FaseCrudConfig
     item = ItemCrudConfig
-    valores = ValoresCrudConfig
+    valorescadena = ValoresCadenaCrudConfig
+    valoresnumero = ValoresNumeroCrudConfig
+    valoresfecha = ValoresNumeroCrudConfig
     lineabase = LineaBaseCrudConfig
     relacion = RelacionCrudConfig
-   
+    
     
    
