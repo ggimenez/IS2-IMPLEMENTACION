@@ -60,10 +60,6 @@ from proyectosaptg.controllers.admin import *
 from proyectosaptg.controllers.admin2 import *
 
 
-#abm de forma manual
-#from tg import tmpl_context
-#from proyectosaptg.widgets.usuario_form import create_usuario_form
-from proyectosaptg.controllers.controlador_proyectos import *
 
 import inspect
 from sqlalchemy.orm import class_mapper

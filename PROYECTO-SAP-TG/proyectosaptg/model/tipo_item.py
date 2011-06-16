@@ -23,7 +23,9 @@ class TipoItem(DeclarativeBase):
 
     id_tipo_item = Column(Integer, primary_key=True)
     nombre = Column(Unicode, nullable=False)
-    cod_tipo_item = Column(Unicode, nullable=False,unique=True)
+    cod_tipo_item = Column(Unicode, nullable=False)
     descripcion = Column(Unicode, nullable=True)
     #atributos = relationship("Atributo", backref="tipo_item")
     atributos = relationship(Atributo, secondary=tipo_item_atributo_table)
+    
+    acumulador = Column(Integer, default=0)

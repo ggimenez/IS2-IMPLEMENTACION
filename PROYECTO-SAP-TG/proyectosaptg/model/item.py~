@@ -23,7 +23,7 @@ class Item(DeclarativeBase):
     __tablename__ = 'item'
 
     id_item = Column(Integer, primary_key=True)
-    cod_item = Column(Unicode, nullable=False,unique=True)
+    cod_item = Column(Unicode, nullable=False)
     nombre = Column(Unicode, nullable=False)
     estado = Column(Unicode, nullable=False, default = 'REVISION')
     version = Column(Integer, nullable=False, default = 0)
