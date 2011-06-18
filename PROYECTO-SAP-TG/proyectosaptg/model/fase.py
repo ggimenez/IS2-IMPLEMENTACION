@@ -20,12 +20,12 @@ class Fase(DeclarativeBase):
     
     
     lineas_bases = relationship("LineaBase")
-    
-
-    
-    #items = relationship("Item", backref="fase")
+   
     items = relationship("Item")
-
-
-
+    
     proyecto_id = Column(Integer, ForeignKey('proyecto.id_proyecto'), nullable=False)
+    
+    
+    orden = Column(Integer, nullable=False)
+    bool_primero = Column(Integer, nullable=False)
+    bool_ultimo = Column(Integer, nullable=False)

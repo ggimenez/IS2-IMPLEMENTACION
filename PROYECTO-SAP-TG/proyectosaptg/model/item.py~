@@ -31,6 +31,10 @@ class Item(DeclarativeBase):
     total_peso = Column(Integer, nullable=True)
     descripcion = Column(Unicode, nullable=True)	
     
+    bool_ultimo = Column(Integer, default=1)
+    
+    
+    
     id_tipo_item_fk = Column(Integer, ForeignKey('tipo_item.id_tipo_item'))
     tipo_item = relationship("TipoItem", uselist=False)
 

@@ -32,8 +32,6 @@ from sprox.widgets import PropertyMultipleSelectField
 
 
 
-
-
 #importamos los controladores de nuestras entidades
 from user_controlador import *
 from proyecto_controlador import *
@@ -44,7 +42,6 @@ from item_controlador import *
 from valores_controlador import *        
 from linea_base_controlador import *        
 from relacion_controlador import *        
-
 
 
 

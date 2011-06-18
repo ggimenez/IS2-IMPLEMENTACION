@@ -31,7 +31,6 @@ from sprox.widgets import PropertyMultipleSelectField
 
 
 
-
 """configuraciones del modelo ValoresCadena"""
 class ValoresCadenaRegistrationForm(AddRecordForm):
     __model__ = ValoresCadena

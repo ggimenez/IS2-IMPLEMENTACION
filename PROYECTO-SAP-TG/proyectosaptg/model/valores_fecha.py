@@ -19,3 +19,6 @@ class ValoresFecha(DeclarativeBase):
     valor = Column(Date, nullable=False, default=datetime.datetime.now())
     
     descripcion = Column(Unicode, nullable=False)    
+
+    bool_ultimo = Column(Integer, default=1)
+    version = Column(Integer, nullable=False, default = 0)

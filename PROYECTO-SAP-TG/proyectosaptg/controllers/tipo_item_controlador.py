@@ -114,6 +114,11 @@ class TipoItemCrudConfig(CrudRestControllerConfig):
         @registered_validate(error_handler=new)
         def post(self, *args, **kw):
             
+            print "post de tipo de item.."
+            
+            print kw
+            
+            
             nombre_tipo_item = kw["nombre"].split(" ")
             
             cod = ""

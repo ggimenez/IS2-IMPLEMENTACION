@@ -17,3 +17,6 @@ class ValoresCadena(DeclarativeBase):
     valor = Column(Unicode, nullable=False, default= 'sin valor')
     
     descripcion = Column(Unicode, nullable=False)    
+    
+    bool_ultimo = Column(Integer, default=1)
+    version = Column(Integer, nullable=False, default = 0)

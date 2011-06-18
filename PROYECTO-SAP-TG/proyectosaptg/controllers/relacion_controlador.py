@@ -80,14 +80,38 @@ class RelacionCrudConfig(CrudRestControllerConfig):
             count = len(objs)
             self.__count__ = count
             return count, objs    
-            
+    new_form_type = RelacionRegistrationForm
+    
+    
 
     class defaultCrudRestController(CrudRestController):
         @with_trailing_slash
-        @expose('proyectosaptg.templates.get_all')
+        @expose('proyectosaptg.templates.get_all_relacion')
         @expose('json')
         @paginate('value_list', items_per_page=7)
         def get_all(self, *args, **kw):
-            return CrudRestController.get_all(self, *args, **kw)
+            retorno = CrudRestController.get_all(self, *args, **kw)
+            
+            if kw.has_key("iid"):
+                retorno["iidd"] = kw["iid"]
+            
+            return retorno
+            
+        @without_trailing_slash
+        @expose('proyectosaptg.templates.new')
+        def new(self, *args, **kw):
+            """Display a page to show a new record."""
+            tmpl_context.widget = self.new_form
+            
+            
+            print "new de relacion:"
+            print kw
+            print args
+            
+            
+            kw["item_origen_fk"] = args[0]    
+        
+            return dict(value=kw, model=self.model.__name__)        
+            
       
-    new_form_type = RelacionRegistrationForm
+    

@@ -8,7 +8,7 @@ import datetime
 
 __all__ = [ 'ValoresNumero' ]
 
-class ValoresCadena(DeclarativeBase):
+class ValoresNumero(DeclarativeBase):
 
     __tablename__ = 'valores_numero'
 

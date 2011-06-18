@@ -74,7 +74,7 @@ class ValoresCadenaCrudConfig(CrudRestControllerConfig):
     class edit_form_type(EditableForm):
         __entity__ = ValoresCadena
        
-        __omit_fields__        = ['id_valor',"fk_atributo"]       
+        __omit_fields__        = ['id_valor',"fk_atributo","bool_ultimo",'version']       
         
         fk_item = HiddenField
         
@@ -167,7 +167,7 @@ class ValoresNumeroCrudConfig(CrudRestControllerConfig):
     class edit_form_type(EditableForm):
         __entity__ = ValoresNumero
        
-        __omit_fields__        = ['id_valor',"fk_atributo"]       
+        __omit_fields__        = ['id_valor',"fk_atributo","bool_ultimo",'version']
         
         fk_item = HiddenField
         
@@ -257,7 +257,7 @@ class ValoresFechaCrudConfig(CrudRestControllerConfig):
     class edit_form_type(EditableForm):
         __entity__ = ValoresFecha
        
-        __omit_fields__        = ['id_valor',"fk_atributo"]       
+        __omit_fields__        = ['id_valor',"fk_atributo","bool_ultimo",'version']
         
         fk_item = HiddenField
         

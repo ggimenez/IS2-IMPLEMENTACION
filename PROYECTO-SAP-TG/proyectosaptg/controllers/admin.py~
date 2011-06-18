@@ -48,12 +48,7 @@ from relacion_controlador import *
 
 
 
-
-
-
-    
-
-#instancimos todas nuestras configuraciones
+#instancimos los controladores
 class MyAdminConfig(AdminConfig):
       
     #DefaultControllerConfig    = MyCrudRestControllerConfig  
