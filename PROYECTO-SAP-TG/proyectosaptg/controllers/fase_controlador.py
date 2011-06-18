@@ -36,7 +36,7 @@ class FaseRegistrationForm(AddRecordForm):
   
     __model__ = Fase
     __require_fields__ = ['cod_fase', 'nombre']
-    __omit_fields__ = ['id_fase','estado','lineas_bases','items']
+    __omit_fields__ = ['id_fase','estado','lineas_bases','items', 'bool_primero', 'bool_ultimo']
     #__field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
     #__base_validator__     = user_form_validator
     #__hidden_fields__      = ['proyecto_id']
@@ -52,12 +52,12 @@ class FaseCrudConfig(CrudRestControllerConfig):
     
     class table_type(TableBase):
         __entity__ =  Fase
-        __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id']
+        __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id', 'orden']
         __url__ = '../fases.json' #this just tidies up the URL a bit"""
 
     class table_filler_type(TableFiller):
         __entity__ = Fase
-        __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id']
+        __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id','orden']
         
         
         def __actions__(self, obj):
@@ -167,6 +167,25 @@ class FaseCrudConfig(CrudRestControllerConfig):
             
             pid = kw["proyecto_id"]
             #print kw["proyecto_id"]
+            
+            
+            #vemos si la fase es la primera, intermedia o ultima...
+            cant_fases_proyec = DBSession.query(Proyecto).filter_by(id_proyecto = pid).one().cant_fases
+            
+            if kw.has_key("orden"):
+                if kw["orden"] == 1:
+                    kw["bool_primero"] = 1
+                    kw["bool_ultimo"] = 0
+                elif kw["orden"] == cant_fases_proyec:
+                    kw["bool_primero"] = 0
+                    kw["bool_ultimo"] = 1
+                elif kw["orden"] > 1 and kw["orden"] < cant_fases_proyec:
+                    kw["bool_primero"] = 0
+                    kw["bool_ultimo"] = 0
+                    
+            
+            
+            
             
             self.provider.create(self.model, params=kw)
             

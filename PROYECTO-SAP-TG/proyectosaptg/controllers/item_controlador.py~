@@ -166,7 +166,7 @@ class ItemCrudConfig(CrudRestControllerConfig):
     class edit_form_type(EditableForm):
         __entity__ = Item
     
-     class edit_filler_type(EditFormFiller):
+    class edit_filler_type(EditFormFiller):
         __entity__ = Item
     
     

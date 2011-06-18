@@ -133,7 +133,7 @@ class ItemCrudConfig(CrudRestControllerConfig):
                 '<a class="volver_link" href="'+href+'">Volver a</a>'\
                 '</div></div>'
     
-                #'<a class="volver_link" href="./revertir/?ivid='+pklist+'&irid='+str(id_item_rev)+'">Volver a</a>'\
+                
                 
             return value
     

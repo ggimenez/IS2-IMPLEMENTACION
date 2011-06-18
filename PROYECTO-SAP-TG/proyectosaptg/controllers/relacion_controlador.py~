@@ -30,6 +30,28 @@ from tgext.crud.controller import CrudRestController
 from sprox.widgets import PropertyMultipleSelectField
 
 
+from sprox.widgets import PropertySingleSelectField
+class MyPropertySingleSelectField(PropertySingleSelectField):
+    def _my_update_params(self, d, nullable=False):
+        
+        print "MyPropertyMultipleSelectField,d:\n:"
+        print d
+        
+        lista_ids = d['options']
+        
+        items = []
+        
+        for iid in lista_ids:
+            items.append(DBSession.query(Item).filter_by(id_item = iid).one())    
+        
+        
+        options = [(item.id_item, item.nombre)
+                            for item in items]
+        d['options']= options
+        return d
+
+
+
 """configuraciones del modelo Relacion"""
 class RelacionRegistrationForm(AddRecordForm):
     __model__ = Relacion
@@ -37,6 +59,9 @@ class RelacionRegistrationForm(AddRecordForm):
     __omit_fields__ = ['id_relacion', 'estado']
     cod_relacion           = TextField
     descripcion            = TextArea
+    
+    item_destino_fk =  MyPropertySingleSelectField
+    __dropdown_field_names__ = {'item_destino_fk':'nombre'}
     
 class RelacionCrudConfig(CrudRestControllerConfig):
     class table_type(TableBase):
@@ -93,25 +118,70 @@ class RelacionCrudConfig(CrudRestControllerConfig):
             retorno = CrudRestController.get_all(self, *args, **kw)
             
             if kw.has_key("iid"):
-                retorno["iidd"] = kw["iid"]
+                retorno["iido"] = kw["iid"]
             
             return retorno
             
-    @without_trailing_slash
-    @expose('proyectosaptg.templates.new')
-    def new(self, *args, **kw):
-        """Display a page to show a new record."""
-        tmpl_context.widget = self.new_form
+        @without_trailing_slash
+        @expose('proyectosaptg.templates.new_relacion')
+        def new(self, *args, **kw):
+            """Display a page to show a new record."""
+            tmpl_context.widget = self.new_form
+            
+            
+            print "new de relacion:"
+            print kw
+            print args
+            
+            
+            #setemos el id origen de la relacion..
+            kw["item_origen_fk"] = args[0]    
         
+            #traemos todos los posibles Items destino de la relacion
+            #1-->traemos todos los items de la fase del Item origen..
+            fase_item_origen_fk = DBSession.query(Item).filter_by(id_item = kw["item_origen_fk"]).one().id_fase_fk
+            
+            items_fase_origen_list = DBSession.query(Item.id_item).filter(Item.id_fase_fk
+                                   == fase_item_origen_fk).filter(Item.id_item != kw["item_origen_fk"]).all()
+            
+            items_fase_origen = []
+            for elemento in items_fase_origen_list:
+                items_fase_origen.append(elemento[0])
+            
+            fase_item_origen = DBSession.query(Fase).filter_by(id_fase = fase_item_origen_fk).one()
+            #2-->traemos todos los items de las fase anterior si la fase del item origen no es la primera
+            proyecto_id = fase_item_origen.proyecto_id
+            orden_item_origen = fase_item_origen.orden
+            items_fase_anterior = []
+            if orden_item_origen > 1:
+                fase_antererior = DBSession.query(Fase).filter_by(proyecto_id = proyecto_id,
+                                orden = (orden_item_origen - 1)).one()
+                items_fase_anterior_list = DBSession.query(Item.id_item).filter_by(id_fase_fk = fase_antererior.id_fase).all()
+                items_fase_anterior = []
+                for elemento in items_fase_anterior_list:
+                    items_fase_anterior.append(elemento[0])
+            
+            
+            #3-->traemos todos los items de la fase siguiente, si la fase del item origen no es la ultima
+            items_fase_siguiente = []
+            if fase_item_origen.bool_ultimo == 0:
+                fase_siguiente = DBSession.query(Fase).filter_by(proyecto_id = proyecto_id,
+                                orden = (orden_item_origen + 1)).one()
+                items_fase_siguiente_list = DBSession.query(Item.id_item).filter_by(id_fase_fk = fase_siguiente.id_fase).all()
+                items_fase_siguiente = []
+                for elemento in items_fase_siguiente_list:
+                    items_fase_siguiente.append(elemento[0])
+            
+            
+            items_a_mostrar = items_fase_anterior + items_fase_origen + items_fase_siguiente
         
-        print "new de relacion:"
-        print kw
-        print args
+                
         
+            print items_a_mostrar
         
-        kw["item_origen_fk"] = args[0]    
-       
-        return dict(value=kw, model=self.model.__name__)        
+            
+        
+            return dict(value=kw, model=self.model.__name__,item_destino_fk_options = items_a_mostrar)        
             
       
     
