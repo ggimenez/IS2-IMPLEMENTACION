@@ -31,23 +31,57 @@ from sprox.widgets import PropertyMultipleSelectField
 
 
 
+class MyRolesPropertyMultipleSelectField(PropertyMultipleSelectField):
+    def _my_update_params(self, d, nullable=False):
+        
+        print "MyPropertyMultipleSelectField,d:\n:"
+        print d
+        
+        el_proyecto = DBSession.query(Proyecto).filter_by(id_proyecto=d["pid"]).one()
+        
+        roles_proyecto = el_proyecto.roles
+        
+        options = [(rol.group_id, rol.group_name)
+                            for rol in roles_proyecto]
+        d['options']= options
+        return d
+
+class MyTipoItemsPropertyMultipleSelectField(PropertyMultipleSelectField):
+    def _my_update_params(self, d, nullable=False):
+        
+        print "MyPropertyMultipleSelectField,d:\n:"
+        print d
+        
+        el_proyecto = DBSession.query(Proyecto).filter_by(id_proyecto=d["pid"]).one()
+        
+        tipo_items_proyecto = el_proyecto.tipo_items
+        
+        options = [(tipo.id_tipo_item, tipo.nombre)
+                            for tipo in tipo_items_proyecto]
+        d['options']= options
+        return d
+
+
+
+
 """configuraciones del modelo Fase"""
 class FaseRegistrationForm(AddRecordForm):
   
     __model__ = Fase
     __require_fields__ = ['cod_fase', 'nombre']
-<<<<<<< HEAD
-    __omit_fields__ = ['id_fase','estado','lineas_bases','items']
-=======
     __omit_fields__ = ['id_fase','estado','lineas_bases','items', 'bool_primero', 'bool_ultimo']
->>>>>>> df5c6dabf2cd05182d04568a08564284c1cf0bd2
     #__field_order__        = ['user_name', 'email_address', 'display_name', 'password', 'verify_password']
     #__base_validator__     = user_form_validator
     #__hidden_fields__      = ['proyecto_id']
     cod_fase           = TextField
     nombre = TextField
+    proyecto_id = HiddenField
     #descripcion                 = TextArea
     #proyecto_id = HiddenField
+    
+    __dropdown_field_names__ = {'roles':'nombre'}
+    roles = MyRolesPropertyMultipleSelectField
+    tipo_items =  MyTipoItemsPropertyMultipleSelectField 
     
 
 
@@ -56,16 +90,12 @@ class FaseCrudConfig(CrudRestControllerConfig):
     
     class table_type(TableBase):
         __entity__ =  Fase
-<<<<<<< HEAD
-        __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id']
-=======
         __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id', 'orden']
->>>>>>> df5c6dabf2cd05182d04568a08564284c1cf0bd2
         __url__ = '../fases.json' #this just tidies up the URL a bit"""
 
     class table_filler_type(TableFiller):
         __entity__ = Fase
-        __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id']
+        __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id','orden']
         
         
         def __actions__(self, obj):
@@ -84,11 +114,7 @@ class FaseCrudConfig(CrudRestControllerConfig):
             '<input class="delete-button" onclick="return confirm(\'Are you sure?\');" value="delete" type="submit" '\
             'style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0;"/>'\
             '</form>'\
-<<<<<<< HEAD
             '<a class="itmes_link" href="../items/?fid='+pklist+'">Items</a> <br/>'\
-=======
-            '<a class="itmes_link" href="../items/?fid='+pklist+'">Items</a> '\
->>>>>>> df5c6dabf2cd05182d04568a08564284c1cf0bd2
             '<a class="lineas_link" href="../lineabases/?fid='+pklist+'">Linea Base</a> '\
             '</div></div>'
             
@@ -164,7 +190,10 @@ class FaseCrudConfig(CrudRestControllerConfig):
             tmpl_context.widget = self.new_form
             
             retorno = dict(value=kw, model=self.model.__name__)
-            #print retorno
+            retorno['pid'] = args[0]
+            
+            print retorno
+            
             return retorno
             
         
@@ -180,8 +209,6 @@ class FaseCrudConfig(CrudRestControllerConfig):
             pid = kw["proyecto_id"]
             #print kw["proyecto_id"]
             
-<<<<<<< HEAD
-=======
             
             #vemos si la fase es la primera, intermedia o ultima...
             cant_fases_proyec = DBSession.query(Proyecto).filter_by(id_proyecto = pid).one().cant_fases
@@ -201,7 +228,6 @@ class FaseCrudConfig(CrudRestControllerConfig):
             
             
             
->>>>>>> df5c6dabf2cd05182d04568a08564284c1cf0bd2
             self.provider.create(self.model, params=kw)
             
             path = '../?pid='+ str(pid)

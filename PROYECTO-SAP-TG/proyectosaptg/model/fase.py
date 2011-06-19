@@ -9,6 +9,17 @@ import datetime
 
 __all__ = [ 'Fase' ]
 
+
+#tabla intermedia entre fases y tipos de items
+fase_tipo_item_table = Table('fase_tipo_item', metadata,
+    Column('fase_id', Integer, ForeignKey('fase.id_fase',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+    Column('tipo_item_id', Integer, ForeignKey('tipo_item.id_tipo_item',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+)
+
+
+
 class Fase(DeclarativeBase):
 
     __tablename__ = 'fase'
@@ -32,6 +43,6 @@ class Fase(DeclarativeBase):
     bool_ultimo = Column(Integer, nullable=False)
     
     roles = relation('Group', secondary=fase_group_table)
-    
+    tipo_items = relationship('TipoItem', secondary=fase_tipo_item_table)    
     
     

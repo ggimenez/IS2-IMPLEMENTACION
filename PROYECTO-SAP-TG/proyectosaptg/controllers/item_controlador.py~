@@ -333,9 +333,9 @@ class ItemCrudConfig(CrudRestControllerConfig):
             #traemos la fase de la BD
             fase = DBSession.query(Fase).filter_by(id_fase = id_fase).one()
             #obtenemos el id del Proyecto, traemos el Proyecto y sus Tipos de Items
-            id_proyecto = fase.proyecto_id
-            proyecto = DBSession.query(Proyecto).filter_by(id_proyecto = id_proyecto).one()
-            tipo_items = proyecto.tipo_items
+            #id_proyecto = fase.proyecto_id
+            #proyecto = DBSession.query(Proyecto).filter_by(id_proyecto = id_proyecto).one()
+            tipo_items = fase.tipo_items
             #obtenemos lo id y los nombres de los tipos de items del Proyecto para enviarlos como las opciones 
             #disponibles
             id_tipo_items = []

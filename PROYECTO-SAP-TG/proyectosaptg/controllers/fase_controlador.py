@@ -31,7 +31,7 @@ from sprox.widgets import PropertyMultipleSelectField
 
 
 
-class MyPropertyMultipleSelectField(PropertyMultipleSelectField):
+class MyRolesPropertyMultipleSelectField(PropertyMultipleSelectField):
     def _my_update_params(self, d, nullable=False):
         
         print "MyPropertyMultipleSelectField,d:\n:"
@@ -45,6 +45,23 @@ class MyPropertyMultipleSelectField(PropertyMultipleSelectField):
                             for rol in roles_proyecto]
         d['options']= options
         return d
+
+class MyTipoItemsPropertyMultipleSelectField(PropertyMultipleSelectField):
+    def _my_update_params(self, d, nullable=False):
+        
+        print "MyPropertyMultipleSelectField,d:\n:"
+        print d
+        
+        el_proyecto = DBSession.query(Proyecto).filter_by(id_proyecto=d["pid"]).one()
+        
+        tipo_items_proyecto = el_proyecto.tipo_items
+        
+        options = [(tipo.id_tipo_item, tipo.nombre)
+                            for tipo in tipo_items_proyecto]
+        d['options']= options
+        return d
+
+
 
 
 """configuraciones del modelo Fase"""
@@ -62,8 +79,9 @@ class FaseRegistrationForm(AddRecordForm):
     #descripcion                 = TextArea
     #proyecto_id = HiddenField
     
-    __dropdown_field_names__ = {'roles':'nombre'}
-    roles = MyPropertyMultipleSelectField
+    __dropdown_field_names__ = {'roles':'nombre', 'tipo_items':'nombre'}
+    roles = MyRolesPropertyMultipleSelectField
+    tipo_items =  MyTipoItemsPropertyMultipleSelectField 
     
 
 
