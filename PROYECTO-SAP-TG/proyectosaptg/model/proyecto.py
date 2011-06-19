@@ -35,10 +35,10 @@ class Proyecto(DeclarativeBase):
     
     usuario_creador = Column(Unicode, nullable=False)
    
-	
+
     
     fases = relationship("Fase")
     
     
     tipo_items = relationship('TipoItem', secondary=proyecto_tipo_item_table)
-
+    roles = relation('Group', secondary=proyecto_group_table)

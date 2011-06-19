@@ -4,6 +4,7 @@ from sqlalchemy.types import *
 
 from proyectosaptg.model import DeclarativeBase, metadata, DBSession
 
+from proyectosaptg.model.auth import fase_group_table
 import datetime 
 
 __all__ = [ 'Fase' ]
@@ -29,3 +30,8 @@ class Fase(DeclarativeBase):
     orden = Column(Integer, nullable=False)
     bool_primero = Column(Integer, nullable=False)
     bool_ultimo = Column(Integer, nullable=False)
+    
+    roles = relation('Group', secondary=fase_group_table)
+    
+    
+    

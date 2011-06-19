@@ -32,7 +32,7 @@ class Item(DeclarativeBase):
     descripcion = Column(Unicode, nullable=True)	
     
     bool_ultimo = Column(Integer, default=1)
-    
+    estaLB = Column(Integer, default=1)
     
     
     id_tipo_item_fk = Column(Integer, ForeignKey('tipo_item.id_tipo_item'))

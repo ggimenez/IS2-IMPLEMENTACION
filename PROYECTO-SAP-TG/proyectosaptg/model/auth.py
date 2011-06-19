@@ -58,7 +58,6 @@ project_user_table = Table('tg_project_user', metadata,
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
-
 #tabla intermedia entre proyectos y roles
 proyecto_group_table = Table('tg_proyecto_group', metadata,
     Column('proyec_id', Integer, ForeignKey('proyecto.id_proyecto',
@@ -67,20 +66,13 @@ proyecto_group_table = Table('tg_proyecto_group', metadata,
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
-#tabla intermedia entre permisos y fases
-permisos_fase_table = Table('tg_permisos_fase', metadata,
-    Column('permisos_id', Integer, ForeignKey('tg_permission.permission_id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+#desaparecio la tabla intermedia entre permisos y fases
+#desaparecio la tabla intermedia entre proyecto, usuarios y roles
+
+
+#tabla intermedia entre fases y roles
+fase_group_table = Table('tg_fase_group', metadata,
     Column('fase_id', Integer, ForeignKey('fase.id_fase',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
-)
-
-
-#tabla intermedia entre proyectos, usuarios y roles
-project_user_group_table = Table('tg_project_user_group', metadata,
-    Column('user_id', Integer, ForeignKey('tg_user.user_id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('proyec_id', Integer, ForeignKey('proyecto.id_proyecto',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
     Column('group_id', Integer, ForeignKey('tg_group.group_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
@@ -115,6 +107,8 @@ class Group(DeclarativeBase):
     #{ Relations
 
     users = relation('User', secondary=user_group_table, backref='groups')
+    #proyecto = relation('Proyecto', secondary=proyecto_group_table, backref='groups')
+    #fase = relation('Fase', secondary=fase_group_table, backref='groups')
 
     #{ Special methods
 

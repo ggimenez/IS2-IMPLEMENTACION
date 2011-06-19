@@ -31,6 +31,22 @@ from sprox.widgets import PropertyMultipleSelectField
 
 
 
+class MyPropertyMultipleSelectField(PropertyMultipleSelectField):
+    def _my_update_params(self, d, nullable=False):
+        
+        print "MyPropertyMultipleSelectField,d:\n:"
+        print d
+        
+        el_proyecto = DBSession.query(Proyecto).filter_by(id_proyecto=d["pid"]).one()
+        
+        roles_proyecto = el_proyecto.roles
+        
+        options = [(rol.group_id, rol.group_name)
+                            for rol in roles_proyecto]
+        d['options']= options
+        return d
+
+
 """configuraciones del modelo Fase"""
 class FaseRegistrationForm(AddRecordForm):
   
@@ -42,8 +58,12 @@ class FaseRegistrationForm(AddRecordForm):
     #__hidden_fields__      = ['proyecto_id']
     cod_fase           = TextField
     nombre = TextField
+    proyecto_id = HiddenField
     #descripcion                 = TextArea
     #proyecto_id = HiddenField
+    
+    __dropdown_field_names__ = {'roles':'nombre'}
+    roles = MyPropertyMultipleSelectField
     
 
 
@@ -59,7 +79,7 @@ class FaseCrudConfig(CrudRestControllerConfig):
         __entity__ = Fase
         __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id','orden']
         
-            
+        
         def __actions__(self, obj):
             """Override this function to define how action links should be displayed for the given record."""
             primary_fields = self.__provider__.get_primary_fields(self.__entity__)
@@ -76,7 +96,7 @@ class FaseCrudConfig(CrudRestControllerConfig):
             '<input class="delete-button" onclick="return confirm(\'Are you sure?\');" value="delete" type="submit" '\
             'style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0;"/>'\
             '</form>'\
-            '<a class="itmes_link" href="../items/?fid='+pklist+'">Items</a> '\
+            '<a class="itmes_link" href="../items/?fid='+pklist+'">Items</a> <br/>'\
             '<a class="lineas_link" href="../lineabases/?fid='+pklist+'">Linea Base</a> '\
             '</div></div>'
             
@@ -152,7 +172,10 @@ class FaseCrudConfig(CrudRestControllerConfig):
             tmpl_context.widget = self.new_form
             
             retorno = dict(value=kw, model=self.model.__name__)
-            #print retorno
+            retorno['pid'] = args[0]
+            
+            print retorno
+            
             return retorno
             
         

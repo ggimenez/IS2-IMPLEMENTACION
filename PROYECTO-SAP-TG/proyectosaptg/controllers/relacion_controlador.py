@@ -62,6 +62,7 @@ class RelacionRegistrationForm(AddRecordForm):
     __omit_fields__ = ['id_relacion', 'estado']
     cod_relacion           = TextField
     descripcion            = TextArea
+    item_origen_fk			= HiddenField
     
     item_destino_fk =  MyPropertySingleSelectField
     __dropdown_field_names__ = {'item_destino_fk':'nombre'}

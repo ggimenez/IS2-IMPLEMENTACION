@@ -39,13 +39,15 @@ class ItemRegistrationForm(AddRecordForm):
     __model__ = Item
     __require_fields__ = ['nombre','id_fase_fk']
     __omit_fields__ = ['id_item','cod_item','version','total_peso', 'estado', 'relaciones','id_linea_base_fk', 
-                    'relacion','linea_base','bool_ultimo']
+                    'relacion','linea_base','bool_ultimo', 'estaLB']
     
     cod_item           = TextField
     nombre = TextField
     __dropdown_field_names__ = {'tipo_item':'nombre'}
-    
+    id_fase_fk = HiddenField
     tipo_item = SingleSelectField
+    
+    
     
     
     
@@ -112,7 +114,7 @@ class ItemCrudConfig(CrudRestControllerConfig):
                 '<input class="delete-button" onclick="return confirm(\'Are you sure?\');" value="delete" type="submit" '\
                 'style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0;"/>'\
                 '</form>'\
-                '<a class="relacion_link" href="../relacions/?iid='+pklist+'">Relaciones </a>'\
+                '<a class="relacion_link" href="../relacions/?iid='+pklist+'">Relaciones </a> <br/>'\
                 '<a class="versiones_link" href="./?codi='+cod_item+'">Revertir</a>'\
                 '</div></div>'
             else:

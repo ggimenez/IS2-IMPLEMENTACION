@@ -123,7 +123,11 @@ class RelacionCrudConfig(CrudRestControllerConfig):
             return retorno
             
         @without_trailing_slash
+<<<<<<< HEAD
+        @expose('proyectosaptg.templates.new')
+=======
         @expose('proyectosaptg.templates.new_relacion')
+>>>>>>> df5c6dabf2cd05182d04568a08564284c1cf0bd2
         def new(self, *args, **kw):
             """Display a page to show a new record."""
             tmpl_context.widget = self.new_form
@@ -134,6 +138,11 @@ class RelacionCrudConfig(CrudRestControllerConfig):
             print args
             
             
+<<<<<<< HEAD
+            kw["item_origen_fk"] = args[0]    
+        
+            return dict(value=kw, model=self.model.__name__)        
+=======
             #setemos el id origen de la relacion..
             kw["item_origen_fk"] = args[0]    
         
@@ -182,6 +191,7 @@ class RelacionCrudConfig(CrudRestControllerConfig):
             
         
             return dict(value=kw, model=self.model.__name__,item_destino_fk_options = items_a_mostrar)        
+>>>>>>> df5c6dabf2cd05182d04568a08564284c1cf0bd2
             
       
     
