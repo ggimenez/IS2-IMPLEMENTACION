@@ -13,6 +13,7 @@ from tg import expose, flash, require, url, request, redirect, tmpl_context
 from tg.decorators import without_trailing_slash, with_trailing_slash, paginate
 from tgext.crud.decorators import registered_validate, register_validators, catch_errors
 from tgext.crud.controller import CrudRestController
+from repoze.what.predicates import has_permission
 
 class MyPropertyMultipleSelectField(PropertyMultipleSelectField):
     def _my_update_params(self, d, nullable=False):
@@ -53,7 +54,9 @@ class LineaBaseCrudConfig(CrudRestControllerConfig):
 			primary_fields 	= self.__provider__.get_primary_fields(self.__entity__)
 			pklist 		= '/'.join(map(lambda x: str(getattr(obj, x)), primary_fields))
 
-			value 		=  '<div><div><a class="edit_link" href="'+pklist+'/edit" style="text-decoration:none">edit</a>'\
+			value 		=  '<div>'
+			if has_permission(''):
+			<div><a class="edit_link" href="'+pklist+'/edit" style="text-decoration:none">edit</a>'\
 			'</div><div>'\
 			'<form method="POST" action="'+pklist+'" class="button-to">'\
 			'<input type="hidden" name="_method" value="DELETE" />'\

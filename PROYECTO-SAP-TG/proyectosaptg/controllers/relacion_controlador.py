@@ -156,28 +156,31 @@ class RelacionCrudConfig(CrudRestControllerConfig):
             #2-->traemos todos los items de las fase anterior si la fase del item origen no es la primera
             proyecto_id = fase_item_origen.proyecto_id
             orden_item_origen = fase_item_origen.orden
-            items_fase_anterior = []
+            """items_fase_anterior = []
             if orden_item_origen > 1:
                 fase_antererior = DBSession.query(Fase).filter_by(proyecto_id = proyecto_id,
                                 orden = (orden_item_origen - 1)).one()
                 items_fase_anterior_list = DBSession.query(Item.id_item).filter_by(id_fase_fk = fase_antererior.id_fase).all()
                 items_fase_anterior = []
                 for elemento in items_fase_anterior_list:
-                    items_fase_anterior.append(elemento[0])
+                    items_fase_anterior.append(elemento[0])"""
             
             
             #3-->traemos todos los items de la fase siguiente, si la fase del item origen no es la ultima
             items_fase_siguiente = []
             if fase_item_origen.bool_ultimo == 0:
                 fase_siguiente = DBSession.query(Fase).filter_by(proyecto_id = proyecto_id,
-                                orden = (orden_item_origen + 1)).one()
-                items_fase_siguiente_list = DBSession.query(Item.id_item).filter_by(id_fase_fk = fase_siguiente.id_fase).all()
-                items_fase_siguiente = []
-                for elemento in items_fase_siguiente_list:
-                    items_fase_siguiente.append(elemento[0])
+                                orden = (orden_item_origen + 1)).all()
+                print "la fase sgte"
+                print fase_siguiente
+                if len(fase_siguiente) > 0:
+                    items_fase_siguiente_list = DBSession.query(Item.id_item).filter_by(id_fase_fk = fase_siguiente[0].id_fase).all()
+                    items_fase_siguiente = []
+                    for elemento in items_fase_siguiente_list:
+                        items_fase_siguiente.append(elemento[0])
             
             
-            items_a_mostrar = items_fase_anterior + items_fase_origen + items_fase_siguiente
+            items_a_mostrar = items_fase_origen + items_fase_siguiente
         
                 
         

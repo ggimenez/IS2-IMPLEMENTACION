@@ -32,7 +32,7 @@ from sprox.widgets import PropertyMultipleSelectField
 
 
 from repoze.what import predicates
-from repoze.what.predicates import not_anonymous
+from repoze.what.predicates import not_anonymous, has_permission
 
 """configuraciones del modelo Proyecto"""
 """proyecto_form_validator =  Schema(chained_validators=(FieldsMatch('password',
@@ -65,29 +65,24 @@ class ProyectoCrudConfig(CrudRestControllerConfig):
         __entity__ = Proyecto
         __limit_fields__ = ['id_proyecto','cod_proyecto', 'nombre','estado', 'fecha_creacion', 
                             'fecha_inicio', 'fecha_finalizacion_anulacion','usuario_creador']
-                            
-        
+
         def __actions__(self, obj):
             """Override this function to define how action links should be displayed for the given record."""
             primary_fields = self.__provider__.get_primary_fields(self.__entity__)
             pklist = '/'.join(map(lambda x: str(getattr(obj, x)), primary_fields))
             
                        
-            value =  '<div><div><a class="edit_link" href="'+pklist+'/edit" style="text-decoration:none">edit</a>'\
-            '</div><div>'\
-            '<form method="POST" action="'+pklist+'" class="button-to">'\
-            '<input type="hidden" name="_method" value="DELETE" />'\
-            '<input class="delete-button" onclick="return confirm(\'Are you sure?\');" value="delete" type="submit" '\
-            'style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0;"/>'\
-            '</form>'\
-            '<a class="fases_link" href="../fases/?pid='+pklist+'">Fases</a>'\
-            '</div></div>'
+            value =  '<div>'
+            if has_permission('editar_proyecto'):
+                value = value + '<div><a class="edit_link" href="'+pklist+'/edit" style="text-decoration:none">edit</a></div>'
+            if has_permission('eliminar_proyecto'):
+                value = value + '<div><form method="POST" action="'+pklist+'" class="button-to"><input type="hidden" name="_method" value="DELETE" /><input class="delete-button" onclick="return confirm(\'Est&aacute; seguro que desea eliminar?\');" value="delete" type="submit" style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0;"/></form></div>'
+            value = value + '<div><a class="fases_link" href="../fases/?pid='+pklist+'">Fases</a></div></div>'
             
             return value
-        
+
         def _do_get_provider_count_and_objs(self, **kw):
-            
-            
+
             limit = kw.get('limit', None)
             offset = kw.get('offset', None)
             order_by = kw.get('order_by', None)
