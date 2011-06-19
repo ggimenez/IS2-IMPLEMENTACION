@@ -57,7 +57,7 @@ class FaseCrudConfig(CrudRestControllerConfig):
 
     class table_filler_type(TableFiller):
         __entity__ = Fase
-        __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id']
+        __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id','orden']
         
         
         def __actions__(self, obj):

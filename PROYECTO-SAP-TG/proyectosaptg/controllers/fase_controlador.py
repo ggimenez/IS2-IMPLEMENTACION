@@ -59,7 +59,7 @@ class FaseCrudConfig(CrudRestControllerConfig):
         __entity__ = Fase
         __limit_fields__ = ['cod_fase', 'nombre','estado', 'proyecto_id','orden']
         
-        
+            
         def __actions__(self, obj):
             """Override this function to define how action links should be displayed for the given record."""
             primary_fields = self.__provider__.get_primary_fields(self.__entity__)
