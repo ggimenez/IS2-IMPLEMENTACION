@@ -93,14 +93,25 @@ class MyAdminSysController(AdminController):
             self.default_index_template = self.config.default_index_template
 
     @with_trailing_slash
-    @expose('tgext.admin.templates.index')
+    @expose('proyectosaptg.templates.index_admin')
     def index(self):
+        
+        print 'entre en el index...!!!'
+        
+        userid = request.identity['repoze.who.userid']
+        
+        print userid
+        
         #overrides the template for this method
         original_index_template = self.index.decoration.engines['text/html']
         new_engine = self.default_index_template.split(':')
         new_engine.extend(original_index_template[2:])
         self.index.decoration.engines['text/html'] = new_engine
-        return dict(models=self.menu)
+        
+        retorno = dict(models=self.menu)
+        retorno['username'] = userid
+
+        return retorno
 
     def _make_controller(self, config, session):
         m = config.model
@@ -150,7 +161,7 @@ class RootController(BaseController):
     menu_adm_sys[User.__name__.lower()] = User
     menu_adm_sys[Permission.__name__.lower()] = Permission
     menu_adm_sys[Group.__name__.lower()] = Group
-    menu_adm_sys[Proyecto.__name__.lower()] = Proyecto
+    #menu_adm_sys[Proyecto.__name__.lower()] = Proyecto
     menu_adm_sys[TipoItem.__name__.lower()] = TipoItem
     menu_adm_sys[Atributo.__name__.lower()] = Atributo
     #admin = AdminController(model, DBSession, config_type=MyAdminConfig, xfavor=models)

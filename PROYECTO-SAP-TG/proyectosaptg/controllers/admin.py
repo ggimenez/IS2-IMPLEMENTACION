@@ -29,6 +29,9 @@ from tgext.crud.controller import CrudRestController
 
 from sprox.widgets import PropertyMultipleSelectField
 
+from repoze.what import predicates
+from repoze.what.predicates import not_anonymous
+
 
 
 
@@ -47,20 +50,24 @@ from relacion_controlador import *
 
 #instancimos los controladores
 class MyAdminConfig(AdminConfig):
-      
-    #DefaultControllerConfig    = MyCrudRestControllerConfig  
-    
-    user = UserCrudConfig
-    proyecto = ProyectoCrudConfig
-    tipoitem = TipoItemCrudConfig
-    atributo = AtributoCrudConfig
-    fase = FaseCrudConfig
-    item = ItemCrudConfig
-    valorescadena = ValoresCadenaCrudConfig
-    valoresnumero = ValoresNumeroCrudConfig
-    valoresfecha = ValoresFechaCrudConfig
-    lineabase = LineaBaseCrudConfig
-    relacion = RelacionCrudConfig
-    
+
+	#DefaultControllerConfig    = MyCrudRestControllerConfig  
+
+
+		
+
+
+	user = UserCrudConfig
+	proyecto = ProyectoCrudConfig
+	tipoitem = TipoItemCrudConfig
+	atributo = AtributoCrudConfig
+	fase = FaseCrudConfig
+	item = ItemCrudConfig
+	valorescadena = ValoresCadenaCrudConfig
+	valoresnumero = ValoresNumeroCrudConfig
+	valoresfecha = ValoresFechaCrudConfig
+	lineabase = LineaBaseCrudConfig
+	relacion = RelacionCrudConfig
+
     
    

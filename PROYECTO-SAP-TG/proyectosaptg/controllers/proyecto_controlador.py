@@ -66,10 +66,6 @@ class ProyectoCrudConfig(CrudRestControllerConfig):
         __limit_fields__ = ['id_proyecto','cod_proyecto', 'nombre','estado', 'fecha_creacion', 
                             'fecha_inicio', 'fecha_finalizacion_anulacion','usuario_creador']
                             
-        """def user_id(self, obj, **kw):
-            user = DBSession.query(User).filter_by(user_id=obj.user_id).one()
-            return user.user_name"""
-        
         
         def __actions__(self, obj):
             """Override this function to define how action links should be displayed for the given record."""
@@ -88,6 +84,22 @@ class ProyectoCrudConfig(CrudRestControllerConfig):
             '</div></div>'
             
             return value
+        
+        def _do_get_provider_count_and_objs(self, **kw):
+            
+            
+            limit = kw.get('limit', None)
+            offset = kw.get('offset', None)
+            order_by = kw.get('order_by', None)
+            desc = kw.get('desc', False)
+            if len(kw) > 0 and kw.has_key("username"):
+                objs = DBSession.query(self.__entity__).filter_by(usuario_creador=kw['username']).all()
+            else:
+                objs = DBSession.query(self.__entity__).all()
+                
+            count = len(objs)
+            self.__count__ = count
+            return count, objs
         
         
     

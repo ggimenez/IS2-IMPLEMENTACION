@@ -29,7 +29,8 @@ from tgext.crud.controller import CrudRestController
 
 from sprox.widgets import PropertyMultipleSelectField
 
-
+from repoze.what import predicates
+from repoze.what.predicates import not_anonymous
 
 
 
@@ -47,23 +48,43 @@ from relacion_controlador import *
 
 
 
-
 #instancimos los controladores
 class MyAdminConfig(AdminConfig):
       
     #DefaultControllerConfig    = MyCrudRestControllerConfig  
-    
-    user = UserCrudConfig
-    proyecto = ProyectoCrudConfig
-    tipoitem = TipoItemCrudConfig
-    atributo = AtributoCrudConfig
-    fase = FaseCrudConfig
-    item = ItemCrudConfig
-    valorescadena = ValoresCadenaCrudConfig
-    valoresnumero = ValoresNumeroCrudConfig
-    valoresfecha = ValoresFechaCrudConfig
-    lineabase = LineaBaseCrudConfig
-    relacion = RelacionCrudConfig
-    
+
+
+		@with_trailing_slash
+		@expose('proyectosaptg.templates.index_admin')
+		def index(self):
+				#overrides the template for this method
+				original_index_template = self.index.decoration.engines['text/html']
+				new_engine = self.default_index_template.split(':')
+				new_engine.extend(original_index_template[2:])
+				self.index.decoration.engines['text/html'] = new_engine
+				
+				userid = request.identity['repoze.who.userid']
+				
+				print '/user id...!!!'
+				print userid
+				
+				
+				return dict(models=[model.__name__ for model in self.config.models.values()])
+
+
+
+
+		user = UserCrudConfig
+		proyecto = ProyectoCrudConfig
+		tipoitem = TipoItemCrudConfig
+		atributo = AtributoCrudConfig
+		fase = FaseCrudConfig
+		item = ItemCrudConfig
+		valorescadena = ValoresCadenaCrudConfig
+		valoresnumero = ValoresNumeroCrudConfig
+		valoresfecha = ValoresFechaCrudConfig
+		lineabase = LineaBaseCrudConfig
+		relacion = RelacionCrudConfig
+
     
    
