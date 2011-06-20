@@ -5,35 +5,19 @@ from sprox.formbase import AddRecordForm, EditableForm
 from formencode import Schema
 from formencode.validators import FieldsMatch
 from tw.forms import *
-
-
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
 from sprox.fillerbase import EditFormFiller
-
-
-
 from proyectosaptg.model import *
-
 from tg import expose, flash, require, url, request, redirect
 from tg.decorators import without_trailing_slash, with_trailing_slash
 from tg.decorators import paginate
 from tgext.crud.decorators import registered_validate, register_validators, catch_errors
-
-
-
 from tg import tmpl_context
-
 from tgext.crud.controller import CrudRestController
-
-
 from sprox.widgets import PropertyMultipleSelectField
-
 from repoze.what import predicates
 from repoze.what.predicates import not_anonymous
-
-
-
 
 #importamos los controladores de nuestras entidades
 from user_controlador import *
@@ -46,17 +30,8 @@ from valores_controlador import *
 from linea_base_controlador import *        
 from relacion_controlador import *        
 
-
-
 #instancimos los controladores
 class MyAdminConfig(AdminConfig):
-
-	#DefaultControllerConfig    = MyCrudRestControllerConfig  
-
-
-		
-
-
 	user = UserCrudConfig
 	proyecto = ProyectoCrudConfig
 	tipoitem = TipoItemCrudConfig
@@ -68,6 +43,4 @@ class MyAdminConfig(AdminConfig):
 	valoresfecha = ValoresFechaCrudConfig
 	lineabase = LineaBaseCrudConfig
 	relacion = RelacionCrudConfig
-
-    
-   
+	

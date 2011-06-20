@@ -16,18 +16,18 @@ from tgext.crud.controller import CrudRestController
 from repoze.what.predicates import has_permission
 
 class MyPropertyMultipleSelectField(PropertyMultipleSelectField):
-    def _my_update_params(self, d, nullable=False):
-        
-        print "MyPropertyMultipleSelectField,d:\n:"
-        print d
-        
-        laFase = DBSession.query(Fase).filter_by(id_fase=d["fid"]).one()
-        items_fase = laFase.items
-        
-        options = [(item_aux.id_item, item_aux.nombre)
-                            for item_aux in items_fase]
-        d['options']= options
-        return d
+	def _my_update_params(self, d, nullable=False):
+
+		laFase = DBSession.query(Fase).filter_by(id_fase=d["fid"]).one()
+		items_fase	= laFase.items
+		options 	= []
+
+		for item_aux in items_fase:
+			if item_aux.estado == 'APROBADO':
+				options.append((item_aux.id_item, item_aux.nombre))
+
+		d['options']= options
+		return d
 
 """configuraciones del modelo LineaBase"""
 class LineaBaseRegistrationForm(AddRecordForm):
@@ -55,16 +55,11 @@ class LineaBaseCrudConfig(CrudRestControllerConfig):
 			pklist 		= '/'.join(map(lambda x: str(getattr(obj, x)), primary_fields))
 
 			value 		=  '<div>'
-			if has_permission(''):
-			<div><a class="edit_link" href="'+pklist+'/edit" style="text-decoration:none">edit</a>'\
-			'</div><div>'\
-			'<form method="POST" action="'+pklist+'" class="button-to">'\
-			'<input type="hidden" name="_method" value="DELETE" />'\
-			'<input class="delete-button" onclick="return confirm(\'Est&aacute; seguro que desea eliminar?\');" value="delete" type="submit" '\
-			'style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0;"/>'\
-			'</form>'\
-			'</div></div>'
-
+			if has_permission('editar_LB'):
+				value = value + '<div><a class="edit_link" href="'+pklist+'/edit" style="text-decoration:none">edit</a></div>'
+			if has_permission('eliminar_LB'):
+				value = value + '<div><form method="POST" action="'+pklist+'" class="button-to"><input type="hidden" name="_method" value="DELETE" /><input class="delete-button" onclick="return confirm(\'Est&aacute; seguro que desea eliminar?\');" value="delete" type="submit" style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0;"/></form></div>'
+			value = value + '</div>'
 			return value
 
 		def items(self, obj, **kw):

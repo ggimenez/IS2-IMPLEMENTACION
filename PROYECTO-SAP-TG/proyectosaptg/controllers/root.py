@@ -1,72 +1,37 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
-
 from tg import expose, flash, require, url, request, redirect
-
-
-
-
 from tg.decorators import with_trailing_slash
 from tg import config as tg_config
-
-
-
-
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
 from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
 from repoze.what import predicates
 from repoze.what.predicates import not_anonymous
-
 from proyectosaptg.lib.base import BaseController
 from proyectosaptg.model import DBSession, metadata
 from proyectosaptg.controllers.error import ErrorController
 from proyectosaptg import model
 from proyectosaptg.controllers.secure import SecureController
-
 from tg import tmpl_context
-#from proyectosaptg.widgets.add_usuario_form import create_add_user_form
-
-
-
 from tg import validate
-
-
 from proyectosaptg.model import *
-
 from sprox.formbase import AddRecordForm
 from tw.forms import TextField,CalendarDatePicker
-
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
-
-
 from tgext.crud import CrudRestController
-#from proyectosaptg.model import DBSession, Usuario
-
-
 from tw.core import WidgetsList
 from tw.forms import TableForm, TextField, CalendarDatePicker, SingleSelectField, TextArea, PasswordField
 from formencode.validators import Int, NotEmpty, DateConverter, DateValidator
-
-
 from sprox.formbase import EditableForm
 from sprox.fillerbase import EditFormFiller
-
-
-#from proyectosaptg.controllers.controlador_usuarios import * 
-#from proyectosaptg.controllers.controlador_proyectos import *
 from proyectosaptg.controllers.admin import *
 from proyectosaptg.controllers.admin2 import *
-
-
-
 import inspect
 from sqlalchemy.orm import class_mapper
-
 from proyectosaptg import model
 from proyectosaptg.model import DBSession
-
 
 class MyAdminSysController(AdminController):
     menu = {}
@@ -84,10 +49,7 @@ class MyAdminSysController(AdminController):
 
         self.config = config
         self.session = session
-
         self.menu = menu
-
-
         self.default_index_template = ':'.join((tg_config.default_renderer, self.index.decoration.engines.get('text/html')[1]))
         if self.config.default_index_template:
             self.default_index_template = self.config.default_index_template
@@ -95,19 +57,12 @@ class MyAdminSysController(AdminController):
     @with_trailing_slash
     @expose('proyectosaptg.templates.index_admin')
     def index(self):
-        
-        print 'entre en el index...!!!'
-        
         userid = request.identity['repoze.who.userid']
-        
-        print userid
-        
         #overrides the template for this method
         original_index_template = self.index.decoration.engines['text/html']
         new_engine = self.default_index_template.split(':')
         new_engine.extend(original_index_template[2:])
         self.index.decoration.engines['text/html'] = new_engine
-        
         retorno = dict(models=self.menu)
         retorno['username'] = userid
 
@@ -125,12 +80,12 @@ class MyAdminSysController(AdminController):
             edit_form    = config.edit_form_type(session)
             edit_filler  = config.edit_filler_type(session)
             allow_only   = config.allow_only
+        
         menu_items = None
         if self.config.include_left_menu:
             menu_items = self.menu
+        
         return ModelController(session, menu_items)
-
-
 
 class RootController(BaseController):
     """
@@ -146,16 +101,8 @@ class RootController(BaseController):
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
 
     """
-    #prueba con crudcontroller	
-    #usuarios = UsuarioRootController(DBSession)
-    #proyectos = ProyectoController(DBSession)
-    
 
     secc = SecureController()    
-
-    #admin = AdminController(model, DBSession, config_type=TGAdminConfig)
-    
-    
 
     menu_adm_sys = {}
     menu_adm_sys[User.__name__.lower()] = User
@@ -164,24 +111,19 @@ class RootController(BaseController):
     #menu_adm_sys[Proyecto.__name__.lower()] = Proyecto
     menu_adm_sys[TipoItem.__name__.lower()] = TipoItem
     menu_adm_sys[Atributo.__name__.lower()] = Atributo
-    #admin = AdminController(model, DBSession, config_type=MyAdminConfig, xfavor=models)
+
     menu_gconfig = {}
-    
     menu_gconfig[Relacion.__name__.lower()] = Relacion
     menu_gconfig[LineaBase.__name__.lower()] = LineaBase
     
     admin= MyAdminSysController(model, DBSession, config_type=MyAdminConfig, menu=menu_adm_sys)
-    
     gconfig= MyAdminSysController(model, DBSession, config_type=MyAdmin2Config, menu=menu_gconfig)
     
-    #admin = AdminController([Proyecto, User], DBSession, config_type=MyAdminConfig)
     error = ErrorController()
 
-    
     @expose('proyectosaptg.templates.index')
-    #@require(not_anonymous(msg='Por favor inicia sesion para continuar.'))
     def index(self):
-        return dict(page='index')	
+        return dict(page='index')
 
 
     @expose('proyectosaptg.templates.about')
@@ -240,11 +182,6 @@ class RootController(BaseController):
                         login_counter = request.environ['repoze.who.logins'] + 1
                         redirect('/login', came_from=came_from, __logins=login_counter)
         userid = request.identity['repoze.who.userid']
-        #print "esto es userid:\n"
-        #print userid
-        #id_el = request.identity['repoze.who.user_id']
-        #print id_el
-        
         flash(_('Welcome back, %s!') % userid)
         redirect(came_from)
 

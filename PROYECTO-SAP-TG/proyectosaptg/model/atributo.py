@@ -15,4 +15,4 @@ class Atributo(DeclarativeBase):
     nombre = Column(Unicode, nullable=False)
     descripcion = Column(Unicode, nullable=True)
     tipo_dato = Column(Unicode, nullable=True)	
-    #id_tipo_item_fk = Column(Integer, ForeignKey('tipo_item.id_tipo_item'))
+

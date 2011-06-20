@@ -1,11 +1,8 @@
 from sqlalchemy import *
 from sqlalchemy.orm import *
 from sqlalchemy.types import *
-
 from proyectosaptg.model import DeclarativeBase, metadata, DBSession
-
 from proyectosaptg.model.auth import proyecto_group_table
-
 import datetime 
 
 #tabla intermedia entre proyectos y tipos de items
@@ -16,12 +13,9 @@ proyecto_tipo_item_table = Table('proyecto_tipo_item', metadata,
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
-
-
 __all__ = [ 'Proyecto' ]
 
 class Proyecto(DeclarativeBase):
-
     __tablename__ = 'proyecto'
 
     id_proyecto = Column(Integer, primary_key=True)
@@ -32,13 +26,7 @@ class Proyecto(DeclarativeBase):
     fecha_creacion = Column(Date, nullable=True, default=datetime.datetime.now())
     fecha_inicio = Column(Date, nullable=True)
     fecha_finalizacion_anulacion = Column(Date, nullable=True)
-    
     usuario_creador = Column(Unicode, nullable=False)
-   
-
-    
     fases = relationship("Fase")
-    
-    
     tipo_items = relationship('TipoItem', secondary=proyecto_tipo_item_table)
     roles = relation('Group', secondary=proyecto_group_table)

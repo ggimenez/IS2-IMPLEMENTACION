@@ -18,18 +18,14 @@ except ImportError:
     sys.exit('ImportError: No module named hashlib\n'
              'If you are on python2.4 this library is not part of python. '
              'Please install it. Example: easy_install hashlib')
-
 from sqlalchemy import Table, ForeignKey, Column
 from sqlalchemy.types import Unicode, Integer, DateTime
 from sqlalchemy.orm import relation, synonym, relationship
-
 from proyectosaptg.model import DeclarativeBase, metadata, DBSession
 
 __all__ = ['User', 'Group', 'Permission']
 
-
 #{ Association tables
-
 
 # This is the association table for the many-to-many relationship between
 # groups and permissions. This is required by repoze.what.
@@ -78,48 +74,27 @@ fase_group_table = Table('tg_fase_group', metadata,
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
-
-
-
 #{ The auth* model itself
-
-
 class Group(DeclarativeBase):
     """
     Group definition for :mod:`repoze.what`.
-
     Only the ``group_name`` column is required by :mod:`repoze.what`.
-
     """
-
     __tablename__ = 'tg_group'
-
     #{ Columns
-
     group_id = Column(Integer, autoincrement=True, primary_key=True)
-
     group_name = Column(Unicode(16), unique=True, nullable=False)
-
     display_name = Column(Unicode(255))
-
     created = Column(DateTime, default=datetime.now)
-
     #{ Relations
-
     users = relation('User', secondary=user_group_table, backref='groups')
-    #proyecto = relation('Proyecto', secondary=proyecto_group_table, backref='groups')
-    #fase = relation('Fase', secondary=fase_group_table, backref='groups')
-
     #{ Special methods
-
     def __repr__(self):
         return '<Group: name=%r>' % self.group_name
 
     def __unicode__(self):
         return self.group_name
-
     #}
-
 
 # The 'info' argument we're passing to the email_address and password columns
 # contain metadata that Rum (http://python-rum.org/) can use generate an
@@ -127,39 +102,24 @@ class Group(DeclarativeBase):
 class User(DeclarativeBase):
     """
     User definition.
-
     This is the user definition used by :mod:`repoze.who`, which requires at
     least the ``user_name`` column.
-
     """
     __tablename__ = 'tg_user'
-
     #{ Columns
-
     user_id = Column(Integer, autoincrement=True, primary_key=True)
-
     user_name = Column(Unicode(16), unique=True, nullable=False)
-
     email_address = Column(Unicode(255), unique=True, nullable=False,
                            info={'rum': {'field':'Email'}})
 
     display_name = Column(Unicode(255))
-    
     nombres_apellidos = Column(Unicode(255))
-  
     _password = Column('password', Unicode(80),
                        info={'rum': {'field':'Password'}})
-
     created = Column(DateTime, default=datetime.now)
-
-
-
     #relaciones
-    #proyectos = relationship("Proyecto", backref="tg_user")
     proyectos = relationship('Proyecto', secondary=project_user_table, backref='user')
-
     #{ Special methods
-
     def __repr__(self):
         return '<User: name=%r, email=%r, display=%r>' % (
                 self.user_name, self.email_address, self.display_name)
@@ -168,7 +128,6 @@ class User(DeclarativeBase):
         return self.display_name or self.user_name
 
     #{ Getters and setters
-
     @property
     def permissions(self):
         """Return a set with all permissions granted to the user."""
@@ -209,7 +168,6 @@ class User(DeclarativeBase):
 
     password = synonym('_password', descriptor=property(_get_password,
                                                         _set_password))
-
     #}
 
     def validate_password(self, password):
@@ -234,35 +192,21 @@ class User(DeclarativeBase):
 class Permission(DeclarativeBase):
     """
     Permission definition for :mod:`repoze.what`.
-
     Only the ``permission_name`` column is required by :mod:`repoze.what`.
-
     """
-
     __tablename__ = 'tg_permission'
-
     #{ Columns
-
     permission_id = Column(Integer, autoincrement=True, primary_key=True)
-
     permission_name = Column(Unicode(63), unique=True, nullable=False)
-
     description = Column(Unicode(255))
-
     #{ Relations
-
     groups = relation(Group, secondary=group_permission_table,
                       backref='permissions')
-
     #{ Special methods
-
     def __repr__(self):
         return '<Permission: name=%r>' % self.permission_name
 
     def __unicode__(self):
         return self.permission_name
-
     #}
-
-
 #}

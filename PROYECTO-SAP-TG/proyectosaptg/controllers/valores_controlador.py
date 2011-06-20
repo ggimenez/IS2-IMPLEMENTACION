@@ -1,34 +1,21 @@
 # -*- coding: utf-8 -*-
-
 from tgext.admin.config import AdminConfig, CrudRestControllerConfig
 from sprox.formbase import AddRecordForm, EditableForm
 from formencode import Schema
 from formencode.validators import FieldsMatch
 from tw.forms import *
-
-
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
 from sprox.fillerbase import EditFormFiller
-
-
-
 from proyectosaptg.model import *
-
 from tg import expose, flash, require, url, request, redirect
 from tg.decorators import without_trailing_slash, with_trailing_slash
 from tg.decorators import paginate
 from tgext.crud.decorators import registered_validate, register_validators, catch_errors
-
-
-
 from tg import tmpl_context
-
 from tgext.crud.controller import CrudRestController
-
-
 from sprox.widgets import PropertyMultipleSelectField
-
+from repoze.what.predicates import has_permission
 
 
 """configuraciones del modelo ValoresCadena"""
@@ -46,6 +33,18 @@ class ValoresCadenaCrudConfig(CrudRestControllerConfig):
     class table_filler_type(TableFiller):
         __entity__ = ValoresCadena
         __limit_fields__ = ['fk_atributo', 'fk_item','valor']
+        
+        def __actions__(self, obj):
+            """Override this function to define how action links should be displayed for the given record."""
+            primary_fields = self.__provider__.get_primary_fields(self.__entity__)
+            pklist = '/'.join(map(lambda x: str(getattr(obj, x)), primary_fields))
+            
+            value =  '<div>'
+            if has_permission('editar_valores'):
+                value = value + '<div><a class="edit_link" href="'+pklist+'/edit" style="text-decoration:none">edit</a></div>'
+            value = value + '</div>'
+            
+            return value
             
         def fk_atributo(self, obj, **kw):
             atributo = DBSession.query(Atributo).filter_by(id_atributo=obj.fk_atributo).one()
@@ -56,7 +55,6 @@ class ValoresCadenaCrudConfig(CrudRestControllerConfig):
             return item.nombre
     
         def _do_get_provider_count_and_objs(self, **kw):
-            
             limit = kw.get('limit', None)
             offset = kw.get('offset', None)
             order_by = kw.get('order_by', None)
@@ -69,23 +67,27 @@ class ValoresCadenaCrudConfig(CrudRestControllerConfig):
             count = len(objs)
             self.__count__ = count
             return count, objs
-       
+
     #vistas para edit...
     class edit_form_type(EditableForm):
         __entity__ = ValoresCadena
-       
         __omit_fields__        = ['id_valor',"fk_atributo","bool_ultimo",'version']       
-        
         fk_item = HiddenField
-        
         descripcion = TextArea    
         __field_order__ = ['descripcion','valor']
         __disable_fields__ = ['descripcion']    
-        
+
     class edit_filler_type(EditFormFiller):
         __entity__ = ValoresCadena
-     
+
     class defaultCrudRestController(CrudRestController):
+        @with_trailing_slash
+        @expose('proyectosaptg.templates.get_all_valores')
+        @expose('json')
+        @paginate('value_list', items_per_page=7)
+        def get_all(self, *args, **kw):
+            return CrudRestController.get_all(self, *args, **kw)
+
         @expose('tgext.crud.templates.edit')
         def edit(self, *args, **kw):
             """Display a page to edit the record."""
@@ -98,9 +100,7 @@ class ValoresCadenaCrudConfig(CrudRestControllerConfig):
             value['_method'] = 'PUT'
             
             return dict(value=value, model=self.model.__name__, pk_count=len(pks)) 
-     
-    
-    
+
         @expose()
         @registered_validate(error_handler=edit)
         def put(self, *args, **kw):
@@ -109,20 +109,13 @@ class ValoresCadenaCrudConfig(CrudRestControllerConfig):
             for i, pk in enumerate(pks):
                 if pk not in kw and i < len(args):
                     kw[pk] = args[i]
-            
-            
-            print "put de valores cadenas.."
-            print kw
-            
+
             iid = kw['fk_item']
             path = '../' * len(pks) + "?iid=" + str(iid)
-            
             self.provider.update(self.model, params=kw)
             redirect(path)
-    
-    
-    new_form_type = ValoresCadenaRegistrationForm
 
+    new_form_type = ValoresCadenaRegistrationForm
 
 """configuraciones del modelo ValoresNumero"""
 class ValoresNumeroRegistrationForm(AddRecordForm):
@@ -139,7 +132,19 @@ class ValoresNumeroCrudConfig(CrudRestControllerConfig):
     class table_filler_type(TableFiller):
         __entity__ = ValoresNumero
         __limit_fields__ = ['fk_atributo', 'fk_item','valor']
+
+        def __actions__(self, obj):
+            """Override this function to define how action links should be displayed for the given record."""
+            primary_fields = self.__provider__.get_primary_fields(self.__entity__)
+            pklist = '/'.join(map(lambda x: str(getattr(obj, x)), primary_fields))
             
+            value =  '<div>'
+            if has_permission('editar_valores'):
+                value = value + '<div><a class="edit_link" href="'+pklist+'/edit" style="text-decoration:none">edit</a></div>'
+            value = value + '</div>'
+            
+            return value
+
         def fk_atributo(self, obj, **kw):
             atributo = DBSession.query(Atributo).filter_by(id_atributo=obj.fk_atributo).one()
             return atributo.nombre
@@ -149,7 +154,6 @@ class ValoresNumeroCrudConfig(CrudRestControllerConfig):
             return item.nombre
     
         def _do_get_provider_count_and_objs(self, **kw):
-            
             limit = kw.get('limit', None)
             offset = kw.get('offset', None)
             order_by = kw.get('order_by', None)
@@ -166,11 +170,8 @@ class ValoresNumeroCrudConfig(CrudRestControllerConfig):
     #vistas para edit...
     class edit_form_type(EditableForm):
         __entity__ = ValoresNumero
-       
         __omit_fields__        = ['id_valor',"fk_atributo","bool_ultimo",'version']
-        
         fk_item = HiddenField
-        
         descripcion = TextArea    
         __field_order__ = ['descripcion','valor']
         __disable_fields__ = ['descripcion']    
@@ -179,6 +180,13 @@ class ValoresNumeroCrudConfig(CrudRestControllerConfig):
         __entity__ = ValoresNumero
      
     class defaultCrudRestController(CrudRestController):
+        @with_trailing_slash
+        @expose('proyectosaptg.templates.get_all_valores')
+        @expose('json')
+        @paginate('value_list', items_per_page=7)
+        def get_all(self, *args, **kw):
+            return CrudRestController.get_all(self, *args, **kw)
+
         @expose('tgext.crud.templates.edit')
         def edit(self, *args, **kw):
             """Display a page to edit the record."""
@@ -191,9 +199,7 @@ class ValoresNumeroCrudConfig(CrudRestControllerConfig):
             value['_method'] = 'PUT'
             
             return dict(value=value, model=self.model.__name__, pk_count=len(pks)) 
-     
-    
-    
+
         @expose()
         @registered_validate(error_handler=edit)
         def put(self, *args, **kw):
@@ -202,15 +208,12 @@ class ValoresNumeroCrudConfig(CrudRestControllerConfig):
             for i, pk in enumerate(pks):
                 if pk not in kw and i < len(args):
                     kw[pk] = args[i]
-            
-            
+
             iid = kw['fk_item']
             path = '../' * len(pks) + "?iid=" + str(iid)
-            
             self.provider.update(self.model, params=kw)
             redirect(path)
-    
-    
+
     new_form_type = ValoresNumeroRegistrationForm
 
 
@@ -229,7 +232,19 @@ class ValoresFechaCrudConfig(CrudRestControllerConfig):
     class table_filler_type(TableFiller):
         __entity__ = ValoresFecha
         __limit_fields__ = ['fk_atributo', 'fk_item','valor']
+
+        def __actions__(self, obj):
+            """Override this function to define how action links should be displayed for the given record."""
+            primary_fields = self.__provider__.get_primary_fields(self.__entity__)
+            pklist = '/'.join(map(lambda x: str(getattr(obj, x)), primary_fields))
             
+            value =  '<div>'
+            if has_permission('editar_valores'):
+                value = value + '<div><a class="edit_link" href="'+pklist+'/edit" style="text-decoration:none">edit</a></div>'
+            value = value + '</div>'
+            
+            return value
+
         def fk_atributo(self, obj, **kw):
             atributo = DBSession.query(Atributo).filter_by(id_atributo=obj.fk_atributo).one()
             return atributo.nombre
@@ -239,7 +254,6 @@ class ValoresFechaCrudConfig(CrudRestControllerConfig):
             return item.nombre
     
         def _do_get_provider_count_and_objs(self, **kw):
-            
             limit = kw.get('limit', None)
             offset = kw.get('offset', None)
             order_by = kw.get('order_by', None)
@@ -269,6 +283,13 @@ class ValoresFechaCrudConfig(CrudRestControllerConfig):
         __entity__ = ValoresFecha
      
     class defaultCrudRestController(CrudRestController):
+        @with_trailing_slash
+        @expose('proyectosaptg.templates.get_all_valores')
+        @expose('json')
+        @paginate('value_list', items_per_page=7)
+        def get_all(self, *args, **kw):
+            return CrudRestController.get_all(self, *args, **kw)
+
         @expose('tgext.crud.templates.edit')
         def edit(self, *args, **kw):
             """Display a page to edit the record."""
@@ -281,9 +302,7 @@ class ValoresFechaCrudConfig(CrudRestControllerConfig):
             value['_method'] = 'PUT'
             
             return dict(value=value, model=self.model.__name__, pk_count=len(pks)) 
-     
-    
-    
+
         @expose()
         @registered_validate(error_handler=edit)
         def put(self, *args, **kw):
@@ -292,13 +311,10 @@ class ValoresFechaCrudConfig(CrudRestControllerConfig):
             for i, pk in enumerate(pks):
                 if pk not in kw and i < len(args):
                     kw[pk] = args[i]
-            
-            
+
             iid = kw['fk_item']
             path = '../' * len(pks) + "?iid=" + str(iid)
-            
             self.provider.update(self.model, params=kw)
             redirect(path)
-    
-    
+
     new_form_type = ValoresFechaRegistrationForm
